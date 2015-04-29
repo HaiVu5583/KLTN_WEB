@@ -15,6 +15,8 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
@@ -24,6 +26,7 @@ import javax.persistence.Table;
 @Table(name = "\"KLTN\".atm_location")
 @NamedQueries({
     @NamedQuery(name = "AtmLocation.findAll", query = "SELECT a FROM AtmLocation a")})
+@XmlRootElement
 public class AtmLocation implements Serializable {
     private static final long serialVersionUID = 1L;
     @Column(name = "fulladdress")
@@ -60,9 +63,29 @@ public class AtmLocation implements Serializable {
     @Column(name = "\"determineLocation\"")
     private String determineLocation;
 
+    @Transient
+    private double distance;
+    
     public AtmLocation() {
     }
-
+     public void copy(AtmLocation atm){
+        this.bank = atm.getBank();
+        this.determineLocation = atm.getDetermineLocation();
+        this.district = atm.getDistrict();
+        this.fulladdress = atm.getFulladdress();
+        this.id = atm.getId();
+        this.latd = atm.getLatd();
+        this.longd = atm.getLongd();
+        this.nummachine = atm.getNummachine();
+        this.opentime = atm.getOpentime();
+        this.phone = atm.getPhone();
+        this.precinct = atm.getPrecinct();
+        this.provinceCity = atm.getProvinceCity();
+        this.standardlization = atm.getStandardlization();
+        this.street = atm.getStreet();
+        this.uniquecode = atm.getUniquecode();
+        this.distance = atm.getDistance();
+    }
     public AtmLocation(Integer id) {
         this.id = id;
     }
@@ -186,6 +209,15 @@ public class AtmLocation implements Serializable {
     public void setDetermineLocation(String determineLocation) {
         this.determineLocation = determineLocation;
     }
+
+    public double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(double distance) {
+        this.distance = distance;
+    }
+    
     public void print(){
         System.out.println("Bank: "+bank);
         System.out.println("Address: "+fulladdress);

@@ -154,6 +154,7 @@ public class Geocoding {
 //        prinRaw("Đường Nguyễn Hữu Thọ, Bắc Linh Đàm, Đại Kim,Hoàng Mai, Hà Nội, Viet Nam");
 //        prinRaw("đại thịnh, mê linh, hà nội, viet nam");
 //    }
+    /*
     public static void main(String[] args) throws IOException, InterruptedException, org.json.simple.parser.ParseException {
 
         ATMLocationDAO atmDAO = new ATMLocationDAO();
@@ -239,5 +240,5 @@ public class Geocoding {
         System.out.println("Count Other: " + Integer.toString(countO));
 
         prinRaw("44 lý thường kiệt,Hoàn Kiếm,Hà Nội, Viet Nam");
-    }
+    }*/
 }

@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Bản đồ ATM Hà Nội</title>
+        <script src="http://maps.google.com/maps/api/js?sensor=false" type="text/javascript"></script>
+        <style>
+            *{
+                font-size: 14px;
+            }
+            .input{
+                min-width: 200px;
+            }
+        </style>
+    </h:head>
+    <h:body>
+        <h:form id="form">
+            <p:growl id="msg" showSummary="true" globalOnly="true"/>
+            <p:panel id="filterPanel" header="Lọc" style="margin-bottom: 10px; margin-top: 10px;">
+                <h:panelGrid columns="6" cellpadding="5" style="margin-left: 100px;">
+                    <h:outputLabel value="Tỉnh/Thành phố"/>
+                    <p:selectOneMenu id="province" value="#{mapController.selectedProvince}" styleClass="input">
+                        <p:ajax listener="#{mapController.onProvinceChange}" update=":form:district, :form:msg" />
+                        <f:selectItem itemLabel="-- Chọn --" noSelectionOption="true"/>
+                        <f:selectItems value="#{mapController.provinceList}" var="province" itemValue="#{province.province}" itemLabel="#{province.province}"/>
+                    </p:selectOneMenu>
+                    <h:outputLabel value="Quận/Huyện" />
+                    <p:selectOneMenu id="district" value="#{mapController.selectedDistrict}" styleClass="input">
+                        <p:ajax listener="#{mapController.onDistrictChange}" update=":form:precinct, :form:msg" />
+                        <f:selectItem itemLabel="-- Chọn --" noSelectionOption="true"/>
+                        <f:selectItems value="#{mapController.districtList}" var="district" itemValue="#{district.district}" itemLabel="#{district.district}"/>
+                    </p:selectOneMenu>
+                    <h:outputLabel value="Phường/Xã" />
+                    <p:selectOneMenu id="precinct" value="#{mapController.selectedPrecinct}" styleClass="input">
+                        <f:selectItem itemLabel="-- Chọn --" noSelectionOption="true"/>
+                        <f:selectItems value="#{mapController.precinctList}" var="precinct" itemValue="#{precinct.precinct}" itemLabel="#{precinct.precinct}"/>
+                    </p:selectOneMenu>
+                </h:panelGrid>
+                <h:panelGrid columns="2" cellpadding="5" style="margin-left: 100px;">
+                    <h:outputText value="Ngân hàng" style="margin-right: 35px;"/>
+                    <p:selectManyCheckbox id="bank" value="#{mapController.selectedBanks}">
+                        <f:selectItems value="#{mapController.bankList}" var="bank" itemValue="#{bank}" itemLabel="#{bank}"/>
+                    </p:selectManyCheckbox>
+                </h:panelGrid>
+                <p:commandButton value="Tìm kiếm" icon= "ui-icon-search" update=":form:map" actionListener="#{mapController.search}"/>
+            </p:panel>
+            <p:gmap id="map" center="21.039483, 105.782940" zoom="13" type="ROADMAP" style="width:100%;height: 600px;" 
+                    mapTypeControl="false" model="#{mapController.mapModel}" >
+                <p:ajax event="overlaySelect" listener="#{mapController.onMarkerSelect}" update="infoWindow"/>
+
+                <p:gmapInfoWindow id="infoWindow" >
+                    <h:panelGrid columns="2">
+                        <h:outputText value="Địa chỉ: "/>
+                        <h:outputText value="#{mapController.selectedAtm.fulladdress}"/>
+                        <h:outputText value="Ngân hàng: "/>
+                        <h:outputText value="#{mapController.selectedAtm.bank}"/>
+                        <h:outputText value="Số điện thoại: " rendered="#{mapController.phoneRender}"/>
+                        <h:outputText value="#{mapController.selectedAtm.phone}" rendered="#{mapController.phoneRender}"/>
+                        <h:outputText value="Giờ hoạt động: " rendered="#{mapController.timeRender}"/>
+                        <h:outputText value="#{mapController.selectedAtm.opentime}" rendered="#{mapController.timeRender}"/>
+                        <h:outputText value="Số lượng máy: " rendered="#{mapController.nummachineRender}"/>
+                        <h:outputText value="#{mapController.selectedAtm.nummachine}" rendered="#{mapController.nummachineRender}"/>
+                    </h:panelGrid>
+                </p:gmapInfoWindow>
+            </p:gmap>
+        </h:form>
+    </h:body>
+</html>
+

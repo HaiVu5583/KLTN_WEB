@@ -1,0 +1,144 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Quản lí điểm đặt ATM</title>
+        <style>
+            *{
+                font-size: 14px;
+            }
+            .input{
+                min-width: 200px;
+            }
+        </style>
+    </h:head>
+    <h:body>
+        <h:form id="form">
+            <p:growl id="msg" showSummary="true" globalOnly="true"/>
+            <p:panel id="filterPanel" header="Lọc" style="margin-bottom: 10px; margin-top: 10px;">
+                <h:panelGrid columns="6" cellpadding="5" style="margin: auto;">
+
+                    <h:outputLabel value="Tìm kiếm"/>
+                    <p:inputText value="#{atmController.keyword}" styleClass="input"/>
+                    <h:outputText />
+                    <h:outputText />
+                    <h:outputText />
+                    <h:outputText />
+
+                    <h:outputLabel value="Tỉnh/Thành phố"/>
+                    <p:selectOneMenu id="province" value="#{atmController.selectedProvince}" styleClass="input">
+                        <p:ajax listener="#{atmController.onProvinceChange}" update="district, msg" />
+                        <f:selectItem itemLabel="-- Chọn --" noSelectionOption="true"/>
+                        <f:selectItems value="#{atmController.provinceList}" var="province" itemValue="#{province.province}" itemLabel="#{province.province}"/>
+                    </p:selectOneMenu>
+                    <h:outputLabel value="Quận/Huyện" />
+                    <p:selectOneMenu id="district" value="#{atmController.selectedDistrict}" styleClass="input">
+                        <p:ajax listener="#{atmController.onDistrictChange}" update="precinct, msg" />
+                        <f:selectItem itemLabel="-- Chọn --" noSelectionOption="true"/>
+                        <f:selectItems value="#{atmController.districtList}" var="district" itemValue="#{district.district}" itemLabel="#{district.district}"/>
+                    </p:selectOneMenu>
+                    <h:outputLabel value="Phường/Xã" />
+                    <p:selectOneMenu id="precinct" value="#{atmController.selectedPrecinct}" styleClass="input">
+                        <f:selectItem itemLabel="-- Chọn --" noSelectionOption="true"/>
+                        <f:selectItems value="#{atmController.precinctList}" var="precinct" itemValue="#{precinct.precinct}" itemLabel="#{precinct.precinct}"/>
+                    </p:selectOneMenu>
+                    <h:outputLabel value="Ngân hàng" />
+                    <p:selectOneMenu id="bank" value="#{atmController.selectedBank}" styleClass="input">
+                        <f:selectItem itemLabel="-- Chọn --" noSelectionOption="true"/>
+                        <f:selectItems value="#{atmController.bankList}" var="bank" itemValue="#{bank}" itemLabel="#{bank}"/>
+                    </p:selectOneMenu>
+
+                    <h:outputLabel value="Trạng thái chuẩn hóa"/>
+                    <p:selectOneMenu value="#{atmController.standardlizationStatus}" styleClass="input">
+                        <f:selectItem itemLabel="-- Chọn --" noSelectionOption="true"/>
+                        <f:selectItem itemLabel="Chưa chuẩn hóa" itemValue="0"/>
+                        <f:selectItem itemLabel="Chuẩn hóa 1" itemValue="1"/>
+                        <f:selectItem itemLabel="Chuẩn hóa 2" itemValue="2"/>
+                    </p:selectOneMenu>
+                    <h:outputLabel value="Trạng thái Geocoding"/>
+                    <p:selectOneMenu value="#{atmController.geocodingStatus}" styleClass="input">
+                        <f:selectItem itemLabel="-- Chọn --" noSelectionOption="true" />
+                        <f:selectItem itemLabel="Đã thực hiện" itemValue="1"/>
+                        <f:selectItem itemLabel="Chưa thực hiện" itemValue="0"/>
+                    </p:selectOneMenu>
+                    <h:outputText />
+                    <h:outputText />
+
+                    <h:outputText />
+                    <p:commandButton value="Tìm kiếm" actionListener="#{atmController.search}" update="form"/>
+                </h:panelGrid>
+            </p:panel>
+
+            <p:dataTable id="atmData" var="atm" value="#{atmController.atmList}" styleClass="table"
+                         rowIndexVar="rowIndex"
+                         paginator="true" paginatorPosition="bottom"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="10,20,30" rows="10"
+                         editable="true" resizableColumns="true">
+                <p:column headerText="STT" style="width: 20px;">
+                    #{rowIndex+1}
+                </p:column>
+                <p:column headerText="Địa chỉ" style="width: 200px;white-space:pre-line;">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText value="#{atm.fulladdress}" /></f:facet>
+                        <f:facet name="input"><p:inputText value="#{atm.fulladdress}" /></f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column headerText="Tỉnh/Thành phố" style="width: 100px;">
+                    <h:outputText value="#{atm.provinceCity}" />
+                </p:column>
+                <p:column headerText="Quận/Huyện" style="width: 100px;">
+                    <h:outputText value="#{atm.district}" />
+                </p:column>
+                <p:column headerText="Phường/Xã" style="width: 100px;">
+                    <h:outputText value="#{atm.precinct}" />
+                </p:column>
+                <p:column headerText="Đường" style="width: 150px;">
+                    <h:outputText value="#{atm.street}" />
+                </p:column>
+                <p:column headerText="Ngân hàng" style="width: 80px;">
+                    <h:outputText value="#{atm.bank}" />
+                </p:column>
+                <p:column headerText="Giờ hoạt động" style="width: 50px;white-space:pre-line;">
+                    <h:outputText value="#{atm.opentime}" />
+                </p:column>
+                <p:column headerText="SĐT" style="width: 80px;">
+                    <h:outputText value="#{atm.phone}" />
+                </p:column>
+                <p:column headerText="Số máy" style="width: 50px;">
+                    <h:outputText value="#{atm.nummachine}" />
+                </p:column>
+                <p:column headerText="Mã máy" style="width: 50px;white-space:pre-line;">
+                    <h:outputText value="#{atm.uniquecode}" />
+                </p:column>
+                <p:column headerText="Vĩ độ" style="width: 80px;">
+                    <h:outputText value="#{atm.latd}" />
+                </p:column>
+                <p:column headerText="Kinh độ" style="width: 80px;">
+                    <h:outputText value="#{atm.longd}" />
+                </p:column>
+                <p:column headerText="Địa điểm xác định" style="width: 100px;">
+                    <h:outputText value="#{atm.determineLocation}" />
+                </p:column>
+                <p:column style="width: 30px;">
+                    <p:rowEditor />
+                </p:column>
+                <p:column style="width: 30px;">
+                    <p:commandButton icon="ui-icon ui-icon-trash" style="border-style: none;"/>
+                </p:column>
+            </p:dataTable>
+
+        </h:form>
+    </h:body>
+</html>
+
+<h:outputText value="Tỉnh/Thành phố" styleClass="input"/>
+<p:inputText value="#{atmController.dialogAtm.provinceCity}" styleClass="input"/>
+<h:outputText value="Quận/Huyện" styleClass="input"/>
+<p:inputText value="#{atmController.dialogAtm.district}" styleClass="input"/>
+<h:outputText value="Phường/Xã" styleClass="input"/>
+<p:inputText value="#{atmController.dialogAtm.precinct}" styleClass="input"/>

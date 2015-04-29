@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Đăng nhập</title>
+        <style>
+            *{
+                font-size: 15px;
+            }
+            .input{
+                min-width: 250px;
+            }
+        </style>
+    </h:head>
+    <h:body>
+        <h:form id="form">
+            <p:growl id="msg" globalOnly="true" />
+            <p:panel header="Đăng nhập" style="max-width: 300px; margin-left: auto; margin-right: auto; margin-top: 100px;">
+                <h:panelGrid columns="1">
+                    <h:outputText value="Tên đăng nhập"/>
+                    <p:inputText value="#{loginController.username}" styleClass="input"/>
+                    <h:outputText value="Mật khẩu" />
+                    <p:inputText type="password" value="#{loginController.password}" styleClass="input"/>
+                    <p:commandButton value="Đăng nhập" action="#{loginController.login}" icon="ui-icon-unlocked" update="msg"/>
+                </h:panelGrid>
+            </p:panel>
+        </h:form>
+        
+    </h:body>
+</html>
+

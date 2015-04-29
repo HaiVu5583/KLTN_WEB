@@ -12,6 +12,9 @@ import java.util.List;
 import kltn.dao.TestDAO;
 import kltn.entity.TestGeo;
 import com.vividsolutions.jts.io.WKTReader;
+import kltn.dao.AreaDAO;
+import kltn.dao.UserDAO;
+import kltn.entity.Area;
 
 /**
  *
@@ -40,4 +43,13 @@ public class Test {
 //        }
 //        return geom;
 //    }
+    public static void main(String[] args) {
+//        AreaDAO areaDAO = new AreaDAO();
+//        List<Area> list = areaDAO.findPrecinctByProvinceAndDistrict("hà nội", "hai bà trưng");
+//        System.out.println(list.size());
+//        for (Area a:list)
+//            System.out.println(a.getPrecinct());
+        UserDAO user = new UserDAO();
+        System.out.println(user.login("admin", "admin"));
+    }
 }

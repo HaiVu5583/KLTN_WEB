@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <h:form>
+            <p:growl id="msg" showSummary="true" globalOnly="true"/>
+            <h:outputLabel value="Tỉnh/Thành phố"/>
+            <p:selectOneMenu id="province" value="#{testController.selectedProvince}" styleClass="input">
+                <p:ajax listener="#{testController.onProvinceChange}" update="district, msg" />
+                <f:selectItem itemLabel="-- Chọn --" itemValue="" noSelectionOption="true"/>
+                <f:selectItems value="#{testController.provinceList}" var="province" itemValue="#{province.province}" itemLabel="#{province.province}"/>
+            </p:selectOneMenu>
+            <h:outputLabel value="Quận/Huyện"/>
+            <p:selectOneMenu id="district" value="#{testController.selectedDistrict}" styleClass="input">
+                <p:ajax listener="#{testController.onDistrictChange}" update="precinct" />
+                <f:selectItem itemLabel="-- Chọn --" />
+                <f:selectItems value="#{testController.districtList}" var="district" itemValue="#{district.district}" itemLabel="#{district.district}"/>
+            </p:selectOneMenu>
+            <h:outputLabel value="Phường/Xã"/>
+            <p:selectOneMenu id="precinct" value="#{testController.selectedPrecinct}" styleClass="input">
+
+                <f:selectItem itemLabel="-- Chọn --" noSelectionOption="true"/>
+                <f:selectItems value="#{testController.precinctList}" var="precinct" itemValue="#{precinct.precinct}" itemLabel="#{precinct.precinct}"/>
+            </p:selectOneMenu>
+
+
+        </h:form>
+    </h:body>
+</html>
+
