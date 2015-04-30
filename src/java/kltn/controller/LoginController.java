@@ -39,7 +39,7 @@ public class LoginController implements Serializable {
         } else {
             ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
             ec.getSessionMap().put("user", username);
-            ec.redirect(ec.getRequestContextPath()+"/faces/index.xhtml");
+            ec.redirect(ec.getRequestContextPath()+"/manage");
         }
     }
     public String getUsername() {

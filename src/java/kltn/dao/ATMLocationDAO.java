@@ -6,6 +6,7 @@
 package kltn.dao;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import kltn.entity.AtmLocation;
 import kltn.hibernate.HibernateUtil;
@@ -214,7 +215,7 @@ public class ATMLocationDAO implements Serializable {
         return list;
     }
 
-    public List<AtmLocation> filter(String province, String district, String precinct, List<String> banks) {
+    public List<AtmLocation> filter(String province, String district, String precinct, String bank) {
         Session session = HibernateUtil.getSessionFactory().openSession();
         List<AtmLocation> list = null;
         Transaction tx = null;
@@ -231,13 +232,16 @@ public class ATMLocationDAO implements Serializable {
             if (!precinct.isEmpty()) {
                 cr.add(Restrictions.eq("precinct", precinct).ignoreCase());
             }
-            Disjunction dis = Restrictions.disjunction();
-            for (String bank:banks)
-                dis.add(Restrictions.eq("bank", bank));
-            cr.add(dis);
+            if (!bank.isEmpty()) {
+                cr.add(Restrictions.eq("bank", bank).ignoreCase());
+            }
+//            Disjunction dis = Restrictions.disjunction();
+//            for (String bank:banks)
+//                dis.add(Restrictions.eq("bank", bank));
+//            cr.add(dis);
             cr.add(Restrictions.neOrIsNotNull("latd", ""));
             cr.addOrder(Order.asc("id"));
-            
+
             list = cr.list();
             tx.commit();
         } catch (HibernateException he) {
@@ -247,90 +251,104 @@ public class ATMLocationDAO implements Serializable {
         }
         return list;
     }
-//    public List<Map.Entry<AtmLocation, Double>> find10NeareastATM(String lat1, String long1) {
-//        Map<AtmLocation, Double> map = new HashMap();
+//    public List<AtmLocation> find10NeareastATM(String lat1, String long1) {
 //        Session session = HibernateUtil.getSessionFactory().openSession();
 //        List<AtmLocation> list = null;
-//        List<Map.Entry<AtmLocation, Double>> listDistance = new ArrayList<>();
-//
 //        Criteria cr = session.createCriteria(AtmLocation.class);
-//        cr.add(Restrictions.isNotNull("latd"));
+//        cr.add(Restrictions.neOrIsNotNull("latd", ""));
 //        list = cr.list();
 //        for (AtmLocation atm : list) {
-//            listDistance.add(new AbstractMap.SimpleEntry<>(atm, Utils.distance(lat1, long1, atm.getLatd(), atm.getLongd())));
+//            atm.setDistance(Utils.distance(Double.parseDouble(lat1), Double.parseDouble(long1), Double.parseDouble(atm.getLatd()), Double.parseDouble(atm.getLongd())));
 //        }
-//        for (int i = 0; i < listDistance.size() - 1; i++) {
-//            for (int j = i + 1; j < listDistance.size(); j++) {
-//                if (listDistance.get(i).getValue() > listDistance.get(j).getValue()) {
-//                    AtmLocation tempAtm = new AtmLocation();
-//                    tempAtm.copy(listDistance.get(i).getKey());
-//                    Double tempDis = listDistance.get(i).getValue();
-//                    listDistance.get(i).getKey().copy(listDistance.get(j).getKey());
-//                    listDistance.get(i).setValue(listDistance.get(j).getValue());
-//                    listDistance.get(j).getKey().copy(tempAtm);
-//                    listDistance.get(j).setValue(tempDis);
+//        for (int i = 0; i < list.size() - 1; i++) {
+//            for (int j = i + 1; j < list.size(); j++) {
+//                if (list.get(i).getDistance() > list.get(j).getDistance()) {
+//                    AtmLocation temp = new AtmLocation();
+//                    temp.copy(list.get(i));
+//                    list.get(i).copy(list.get(j));
+//                    list.get(j).copy(temp);
 //                }
+//
 //            }
 //        }
-//        for (int i=0; i<20; i++) {
-//            Map.Entry<AtmLocation, Double> entry = listDistance.get(i);
-//            System.out.println(entry.getKey().getFulladdress());
-//            System.out.println(entry.getKey().getLatd());
-//            System.out.println(entry.getKey().getLongd());
-//            System.out.println(entry.getValue());
-//            System.out.println("-------------------------");
-//        }
-//        return null;
-//
+//        return list.subList(0, 19);
 //    }
-
-    public List<AtmLocation> find10NeareastATM(String lat1, String long1) {
+    public List<AtmLocation> find10NeareastATM(String lat1, String long1, String bank, char type) {
         Session session = HibernateUtil.getSessionFactory().openSession();
-        List<AtmLocation> list = null;
+        List<AtmLocation> list = new ArrayList();
         Criteria cr = session.createCriteria(AtmLocation.class);
         cr.add(Restrictions.neOrIsNotNull("latd", ""));
-        list = cr.list();
-        for (AtmLocation atm : list) {
-            atm.setDistance(Utils.distance(lat1, long1, atm.getLatd(), atm.getLongd()));
-        }
-        for (int i = 0; i < list.size() - 1; i++) {
-            for (int j = i + 1; j < list.size(); j++) {
-                if (list.get(i).getDistance() > list.get(j).getDistance()) {
-                    AtmLocation temp = new AtmLocation();
-                    temp.copy(list.get(i));
-                    list.get(i).copy(list.get(j));
-                    list.get(j).copy(temp);
+        if (type == '0') {
+            list = cr.list();
+            for (AtmLocation atm : list) {
+                atm.setDistance(Utils.distance(Double.parseDouble(lat1), Double.parseDouble(long1), Double.parseDouble(atm.getLatd()), Double.parseDouble(atm.getLongd())));
+            }
+            for (int i = 0; i < list.size() - 1; i++) {
+                for (int j = i + 1; j < list.size(); j++) {
+                    if (list.get(i).getDistance() > list.get(j).getDistance()) {
+                        AtmLocation temp = new AtmLocation();
+                        temp.copy(list.get(i));
+                        list.get(i).copy(list.get(j));
+                        list.get(j).copy(temp);
+                    }
+
                 }
 
             }
+            return (list.size() > 20 ? list.subList(0, 19) : list);
+        } else if (type == '1') {
+            cr.add(Restrictions.eq("bank", bank.toLowerCase()));
+            list = cr.list();
+            for (AtmLocation atm : list) {
+                atm.setDistance(Utils.distance(Double.parseDouble(lat1), Double.parseDouble(long1), Double.parseDouble(atm.getLatd()), Double.parseDouble(atm.getLongd())));
+            }
+            for (int i = 0; i < list.size() - 1; i++) {
+                for (int j = i + 1; j < list.size(); j++) {
+                    if (list.get(i).getDistance() > list.get(j).getDistance()) {
+                        AtmLocation temp = new AtmLocation();
+                        temp.copy(list.get(i));
+                        list.get(i).copy(list.get(j));
+                        list.get(j).copy(temp);
+                    }
 
-        }
-        return list.subList(0, 19);
-    }
-
-    public List<AtmLocation> find10NeareastATM(String lat1, String long1, String bank) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        List<AtmLocation> list = null;
-        Criteria cr = session.createCriteria(AtmLocation.class);
-        cr.add(Restrictions.isNotNull("latd"));
-        cr.add(Restrictions.eq("bank", bank.toLowerCase()));
-        list = cr.list();
-        for (AtmLocation atm : list) {
-            atm.setDistance(Utils.distance(lat1, long1, atm.getLatd(), atm.getLongd()));
-        }
-        for (int i = 0; i < list.size() - 1; i++) {
-            for (int j = i + 1; j < list.size(); j++) {
-                if (list.get(i).getDistance() > list.get(j).getDistance()) {
-                    AtmLocation temp = new AtmLocation();
-                    temp.copy(list.get(i));
-                    list.get(i).copy(list.get(j));
-                    list.get(j).copy(temp);
                 }
 
             }
+            return (list.size() > 20 ? list.subList(0, 19) : list);
+        } else if (type == '2') {
+            BankInfoDAO bankInfoDAO = new BankInfoDAO();
+            List<String> banks = bankInfoDAO.findByGroup(bank);
+            if(banks == null || banks.isEmpty()){
+                cr.add(Restrictions.eq("bank", ""));
+                list = cr.list();
+                return list;
+            }
+            Disjunction dis = Restrictions.disjunction();
+            for (String s : banks) {
+                dis.add(Restrictions.eq("bank", s).ignoreCase());
+            }
+            cr.add(dis);
+            list = cr.list();
+            for (AtmLocation atm : list) {
+                atm.setDistance(Utils.distance(Double.parseDouble(lat1), Double.parseDouble(long1), Double.parseDouble(atm.getLatd()), Double.parseDouble(atm.getLongd())));
+            }
+            for (int i = 0; i < list.size() - 1; i++) {
+                for (int j = i + 1; j < list.size(); j++) {
+                    if (list.get(i).getDistance() > list.get(j).getDistance()) {
+                        AtmLocation temp = new AtmLocation();
+                        temp.copy(list.get(i));
+                        list.get(i).copy(list.get(j));
+                        list.get(j).copy(temp);
+                    }
 
+                }
+
+            }
+            return (list.size() > 20 ? list.subList(0, 19) : list);
         }
-        return (list.size() > 20 ? list.subList(0, 19) : list);
+        cr.add(Restrictions.eq("bank", ""));
+        list = cr.list();
+        return list;
     }
 
     public void insert(AtmLocation atm) {

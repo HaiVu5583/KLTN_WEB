@@ -19,11 +19,11 @@
     <h:body>
         <h:form id="form">
             <p:menubar>
-                <p:menuitem value="Quản lí ATM" url="faces/index.xhtml" icon="ui-icon-wrench" style="margin: 5px;"/>
-                <p:menuitem value="Cập nhật dữ liệu" url="faces/start.xhtml" icon="ui-icon-arrowstop-1-s" style="margin: 5px;"/>
+                <p:menuitem value="Quản lí ATM" action="#{pageNavigator.toManagePage}" icon="ui-icon-wrench" style="margin: 5px;"/>
+                <p:menuitem value="Cập nhật dữ liệu" action="#{pageNavigator.toCrawlPage}" icon="ui-icon-arrowstop-1-s" style="margin: 5px;"/>
                 <f:facet name="options">
                     <p:menuButton value="Xin chào, admin">
-                        <p:menuitem value="Đăng xuất" icon="ui-icon-power"/>
+                        <p:menuitem value="Đăng xuất" icon="ui-icon-power" action="#{pageNavigator.toLoginPage}"/>
                     </p:menuButton>
                 </f:facet>
             </p:menubar>

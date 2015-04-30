@@ -26,9 +26,11 @@ import kltn.entity.AtmLocation;
 @javax.ejb.Stateless
 @Path("atm")
 public class AtmLocationFacadeREST extends AbstractFacade<AtmLocation> {
+
     @PersistenceContext(unitName = "KLTN_WEBPU")
     private EntityManager em;
     private ATMLocationDAO atmDAO;
+
     public AtmLocationFacadeREST() {
         super(AtmLocation.class);
         atmDAO = new ATMLocationDAO();
@@ -53,14 +55,12 @@ public class AtmLocationFacadeREST extends AbstractFacade<AtmLocation> {
 //    public void remove(@PathParam("id") Integer id) {
 //        super.remove(super.find(id));
 //    }
-
 //    @GET
 //    @Path("{id}")
 //    @Produces({"application/xml", "application/json"})
 //    public AtmLocation find(@PathParam("id") Integer id) {
 //        return super.find(id);
 //    }
-
     @GET
     @Override
     @Produces("application/xml")
@@ -72,13 +72,19 @@ public class AtmLocationFacadeREST extends AbstractFacade<AtmLocation> {
     @Path("{lat}/{long}")
     @Produces({"application/xml"})
     public List<AtmLocation> findRange(@PathParam("lat") String lat1, @PathParam("long") String long1) {
-        return atmDAO.find10NeareastATM(lat1, long1);
+        return atmDAO.find10NeareastATM(lat1, long1, "", '0');
     }
+
     @GET
-    @Path("{bank}/{lat}/{long}")
+    @Path("{type}/{bank}/{lat}/{long}")
     @Produces({"application/xml"})
-    public List<AtmLocation> findRange(@PathParam("bank") String bank,@PathParam("lat") String lat1, @PathParam("long") String long1) {
-        return atmDAO.find10NeareastATM(lat1, long1, bank);
+    public List<AtmLocation> findRange(@PathParam("type") String type, @PathParam("bank") String bank, @PathParam("lat") String lat1, @PathParam("long") String long1) {
+        if (type.equals("1")) {
+            return atmDAO.find10NeareastATM(lat1, long1, bank, '1');
+        } else if (type.equals("2")) {
+            return atmDAO.find10NeareastATM(lat1, long1, bank, '2');
+        }
+        return atmDAO.find10NeareastATM(lat1, long1, bank, '3');
     }
 
 //    @GET
@@ -91,7 +97,7 @@ public class AtmLocationFacadeREST extends AbstractFacade<AtmLocation> {
     @Override
     protected EntityManager getEntityManager() {
         return em;
-        
+
     }
-    
+
 }

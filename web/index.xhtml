@@ -26,19 +26,14 @@
         <h:form id="form">
             <p:growl id="msg" showSummary="true" globalOnly="true"/>
             <p:menubar>
-                <p:menuitem value="Quản lí ATM" url="faces/index.xhtml" icon="ui-icon-wrench" style="margin: 5px;"/>
-                <p:menuitem value="Cập nhật dữ liệu" url="faces/start.xhtml" icon="ui-icon-arrowstop-1-s" style="margin: 5px;"/>
+                <p:menuitem value="Quản lí ATM" action="#{pageNavigator.toManagePage}" icon="ui-icon-wrench" style="margin: 5px;"/>
+                <p:menuitem value="Cập nhật dữ liệu" action="#{pageNavigator.toCrawlPage}" icon="ui-icon-arrowstop-1-s" style="margin: 5px;"/>
                 <f:facet name="options">
                     <p:menuButton value="Xin chào, #{atmController.username}">
-                        <p:menuitem value="Đăng xuất" icon="ui-icon-power" action="#{atmController.logout}"/>
+                        <p:menuitem value="Đăng xuất" icon="ui-icon-power" action="#{pageNavigator.toLoginPage}"/>
                     </p:menuButton>
                 </f:facet>
             </p:menubar>
-            <h:panelGrid columns="2" cellpadding="5">
-                <h:outputText value="Xin chào, #{atmController.username}" styleClass="welcome"/>
-                <p:commandButton value="Đăng xuất" action="#{atmController.logout}"/>
-            </h:panelGrid>
-
             <p:panel id="filterPanel" header="Lọc" style="margin-bottom: 10px; margin-top: 10px;">
                 <h:panelGrid columns="6" cellpadding="5" style="margin: auto;">
 
@@ -88,7 +83,7 @@
                     <h:outputText />
                     <h:outputText />
                     <h:outputText />
-                    <p:commandButton value="Tìm kiếm" icon= "ui-icon-search" actionListener="#{atmController.search}" update="form"/>
+                    <p:commandButton value="Tìm kiếm" icon= "ui-icon-search" actionListener="#{atmController.search}" update="form" styleClass="btn btn-success"/>
                 </h:panelGrid>
             </p:panel>
 

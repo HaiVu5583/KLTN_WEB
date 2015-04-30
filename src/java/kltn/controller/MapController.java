@@ -50,8 +50,9 @@ public class MapController implements Serializable {
     private List<Area> precinctList;
     private String selectedPrecinct;
 
-    List<String> selectedBanks;
+//    List<String> selectedBanks;
     List<String> bankList;
+    String selectedBank;
 
     @PostConstruct
     public void init() {
@@ -62,7 +63,7 @@ public class MapController implements Serializable {
         provinceList = areaDAO.findByType('1');
 
         bankList = atmDAO.listBank();
-        selectedBanks = atmDAO.listBank();
+//      selectedBanks = atmDAO.listBank();
 
         List<AtmLocation> atmList = atmDAO.findByGeocodingStatus('1');
         for (AtmLocation atm : atmList) {
@@ -134,7 +135,7 @@ public class MapController implements Serializable {
                 sb.append(selectedPrecinct);
             }
         }
-        List<AtmLocation> atmList = atmDAO.filter(selectedProvince, selectedDistrict, selectedPrecinct, selectedBanks);
+        List<AtmLocation> atmList = atmDAO.filter(selectedProvince, selectedDistrict, selectedPrecinct, selectedBank);
         List<Marker> markers = mapModel.getMarkers();
         markers.clear();
         for (AtmLocation atm : atmList) {
@@ -207,14 +208,24 @@ public class MapController implements Serializable {
         this.selectedPrecinct = selectedPrecinct;
     }
 
-    public List<String> getSelectedBanks() {
-        return selectedBanks;
+//    public List<String> getSelectedBanks() {
+//        return selectedBanks;
+//    }
+//
+//    public void setSelectedBanks(List<String> selectedBanks) {
+//        this.selectedBanks = selectedBanks;
+//    }
+
+    public String getSelectedBank() {
+        return selectedBank;
     }
 
-    public void setSelectedBanks(List<String> selectedBanks) {
-        this.selectedBanks = selectedBanks;
+    public void setSelectedBank(String selectedBank) {
+        this.selectedBank = selectedBank;
     }
 
+    
+    
     public List<String> getBankList() {
         return bankList;
     }
