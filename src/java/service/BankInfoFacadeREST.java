@@ -35,54 +35,13 @@ public class BankInfoFacadeREST extends AbstractFacade<BankInfo> {
         bankInfoDAO = new BankInfoDAO();
     }
 
-    @POST
-    @Override
-    @Consumes({"application/xml", "application/json"})
-    public void create(BankInfo entity) {
-        super.create(entity);
-    }
-
-    @PUT
-    @Path("{id}")
-    @Consumes({"application/xml", "application/json"})
-    public void edit(@PathParam("id") String id, BankInfo entity) {
-        super.edit(entity);
-    }
-
-    @DELETE
-    @Path("{id}")
-    public void remove(@PathParam("id") String id) {
-        super.remove(super.find(id));
-    }
-
-    @GET
-    @Path("{id}")
-    @Produces({"application/xml", "application/json"})
-    public BankInfo find(@PathParam("id") String id) {
-        return super.find(id);
-    }
-
+   
     @GET
     @Override
-    @Produces({"application/xml", "application/json"})
+    @Produces("application/json;charset=UTF-8")
     public List<BankInfo> findAll() {
         return bankInfoDAO.listAll();
     }
-
-    @GET
-    @Path("{from}/{to}")
-    @Produces({"application/xml", "application/json"})
-    public List<BankInfo> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
-        return super.findRange(new int[]{from, to});
-    }
-
-    @GET
-    @Path("count")
-    @Produces("text/plain")
-    public String countREST() {
-        return String.valueOf(super.count());
-    }
-
     @Override
     protected EntityManager getEntityManager() {
         return em;

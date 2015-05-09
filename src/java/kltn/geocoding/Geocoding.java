@@ -104,7 +104,6 @@ public class Geocoding {
         InputStream is = httpsCon.getInputStream();
         StringWriter writer = new StringWriter();
         IOUtils.copy(is, writer, "UTF-8");
-
         String jsonString = writer.toString();
         System.out.println(jsonString);
     }

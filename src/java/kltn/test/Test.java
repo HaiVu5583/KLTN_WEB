@@ -5,16 +5,7 @@
  */
 package kltn.test;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.io.ParseException;
-import java.util.List;
-import kltn.dao.TestDAO;
-import kltn.entity.TestGeo;
-import com.vividsolutions.jts.io.WKTReader;
-import kltn.dao.AreaDAO;
 import kltn.dao.UserDAO;
-import kltn.entity.Area;
 
 /**
  *

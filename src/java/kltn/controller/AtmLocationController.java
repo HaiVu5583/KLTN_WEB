@@ -140,44 +140,44 @@ public class AtmLocationController implements Serializable {
 //        sb.append(geocodingStatus);
 //        sb.append("\n");
 
-        if (selectedProvince == null) {
-            sb.append("Province NULL");
-        } else {
-            if (selectedProvince.isEmpty()) {
-                sb.append("Province EMPTY");
-            } else {
-                sb.append(selectedProvince);
-            }
-        }
-        if (selectedDistrict == null) {
-            sb.append("District NULL");
-        } else {
-            if (selectedDistrict.isEmpty()) {
-                sb.append("District EMPTY");
-            } else {
-                sb.append(selectedDistrict);
-            }
-        }
-        if (selectedPrecinct == null) {
-            sb.append("Precinct NULL");
-        } else {
-            if (selectedPrecinct.isEmpty()) {
-                sb.append("Precinct EMPTY");
-            } else {
-                sb.append(selectedPrecinct);
-            }
-        }
-        if (selectedBank == null) {
-            sb.append("Bank NULL");
-        } else {
-            if (selectedBank.isEmpty()) {
-                sb.append("Bank Empty");
-            } else {
-                sb.append(selectedBank);
-            }
-        }
-
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(sb.toString()));
+//        if (selectedProvince == null) {
+//            sb.append("Province NULL");
+//        } else {
+//            if (selectedProvince.isEmpty()) {
+//                sb.append("Province EMPTY");
+//            } else {
+//                sb.append(selectedProvince);
+//            }
+//        }
+//        if (selectedDistrict == null) {
+//            sb.append("District NULL");
+//        } else {
+//            if (selectedDistrict.isEmpty()) {
+//                sb.append("District EMPTY");
+//            } else {
+//                sb.append(selectedDistrict);
+//            }
+//        }
+//        if (selectedPrecinct == null) {
+//            sb.append("Precinct NULL");
+//        } else {
+//            if (selectedPrecinct.isEmpty()) {
+//                sb.append("Precinct EMPTY");
+//            } else {
+//                sb.append(selectedPrecinct);
+//            }
+//        }
+//        if (selectedBank == null) {
+//            sb.append("Bank NULL");
+//        } else {
+//            if (selectedBank.isEmpty()) {
+//                sb.append("Bank Empty");
+//            } else {
+//                sb.append(selectedBank);
+//            }
+//        }
+//
+//        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(sb.toString()));
         atmList = atmDAO.filter(keyword, selectedProvince, selectedDistrict, selectedPrecinct, standardlizationStatus, geocodingStatus, selectedBank);
 //        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(Integer.toString(atmList.size())));
     }
@@ -209,7 +209,7 @@ public class AtmLocationController implements Serializable {
 
             if (dialogAtm.getLatd() != null && !dialogAtm.getLatd().trim().equals("")) {
 
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(Integer.toString(dialogAtm.getLatd().trim().length())));
+//                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(Integer.toString(dialogAtm.getLatd().trim().length())));
                 mapCenter = dialogAtm.getLatd() + ", " + dialogAtm.getLongd();
                 List<Marker> list = mapModel.getMarkers();
                 list.clear();

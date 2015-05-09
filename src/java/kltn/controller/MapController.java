@@ -68,7 +68,23 @@ public class MapController implements Serializable {
         List<AtmLocation> atmList = atmDAO.findByGeocodingStatus('1');
         for (AtmLocation atm : atmList) {
             LatLng coord = new LatLng(Double.parseDouble(atm.getLatd()), Double.parseDouble(atm.getLongd()));
-            mapModel.addOverlay(new Marker(coord, "Thông tin ATM", atm));
+            if (atm.getBank().toLowerCase().equals("vietcombank")) {
+                mapModel.addOverlay(new Marker(coord, "Thông tin ATM", atm, "images/vietcombank.png"));
+            } else if (atm.getBank().toLowerCase().equals("vietinbank")) {
+                mapModel.addOverlay(new Marker(coord, "Thông tin ATM", atm, "images/vietinbank.png"));
+            } else if (atm.getBank().toLowerCase().equals("mbbank")) {
+                mapModel.addOverlay(new Marker(coord, "Thông tin ATM", atm, "images/mbbank.png"));
+            } else if (atm.getBank().toLowerCase().equals("agribank")) {
+                mapModel.addOverlay(new Marker(coord, "Thông tin ATM", atm, "images/agribank.png"));
+            } else if (atm.getBank().toLowerCase().equals("techcombank")) {
+                mapModel.addOverlay(new Marker(coord, "Thông tin ATM", atm, "images/techcombank.png"));
+            } else if (atm.getBank().toLowerCase().equals("bidv")) {
+                mapModel.addOverlay(new Marker(coord, "Thông tin ATM", atm, "images/bidv.png"));
+            } else if (atm.getBank().toLowerCase().equals("acb")) {
+                mapModel.addOverlay(new Marker(coord, "Thông tin ATM", atm, "images/acb.png"));
+            } else {
+                mapModel.addOverlay(new Marker(coord, "Thông tin ATM", atm));
+            }
         }
     }
 
@@ -139,7 +155,25 @@ public class MapController implements Serializable {
         List<Marker> markers = mapModel.getMarkers();
         markers.clear();
         for (AtmLocation atm : atmList) {
-            mapModel.addOverlay(new Marker(new LatLng(Double.parseDouble(atm.getLatd()), Double.parseDouble(atm.getLongd())), "Thông tin ATM", atm));
+//            mapModel.addOverlay(new Marker(new LatLng(Double.parseDouble(atm.getLatd()), Double.parseDouble(atm.getLongd())), "Thông tin ATM", atm));
+            LatLng coord = new LatLng(Double.parseDouble(atm.getLatd()), Double.parseDouble(atm.getLongd()));
+            if (atm.getBank().toLowerCase().equals("vietcombank")) {
+                mapModel.addOverlay(new Marker(coord, "Thông tin ATM", atm, "images/vietcombank.png"));
+            } else if (atm.getBank().toLowerCase().equals("vietinbank")) {
+                mapModel.addOverlay(new Marker(coord, "Thông tin ATM", atm, "images/vietinbank.png"));
+            } else if (atm.getBank().toLowerCase().equals("mbbank")) {
+                mapModel.addOverlay(new Marker(coord, "Thông tin ATM", atm, "images/mbbank.png"));
+            } else if (atm.getBank().toLowerCase().equals("agribank")) {
+                mapModel.addOverlay(new Marker(coord, "Thông tin ATM", atm, "images/agribank.png"));
+            } else if (atm.getBank().toLowerCase().equals("techcombank")) {
+                mapModel.addOverlay(new Marker(coord, "Thông tin ATM", atm, "images/techcombank.png"));
+            } else if (atm.getBank().toLowerCase().equals("bidv")) {
+                mapModel.addOverlay(new Marker(coord, "Thông tin ATM", atm, "images/bidv.png"));
+            } else if (atm.getBank().toLowerCase().equals("acb")) {
+                mapModel.addOverlay(new Marker(coord, "Thông tin ATM", atm, "images/acb.png"));
+            } else {
+                mapModel.addOverlay(new Marker(coord, "Thông tin ATM", atm));
+            }
         }
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(sb.toString()));
     }
@@ -215,7 +249,6 @@ public class MapController implements Serializable {
 //    public void setSelectedBanks(List<String> selectedBanks) {
 //        this.selectedBanks = selectedBanks;
 //    }
-
     public String getSelectedBank() {
         return selectedBank;
     }
@@ -224,8 +257,6 @@ public class MapController implements Serializable {
         this.selectedBank = selectedBank;
     }
 
-    
-    
     public List<String> getBankList() {
         return bankList;
     }

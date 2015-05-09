@@ -54,7 +54,6 @@ public class Utils {
 //        }
 //        return distance.get(0);
 //    }
-
     public static double deg2Rad(double deg) {
         return deg * Math.PI / 180;
     }
@@ -63,11 +62,19 @@ public class Utils {
         double R = 6371; // Radius of the earth in km
         double dLat = deg2Rad(lat2 - lat1);  // deg2rad below
         double dLon = deg2Rad(long2 - long1);
-        double a  = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-                    + Math.cos(deg2Rad(lat1)) * Math.cos(deg2Rad(lat2))
-                       * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(deg2Rad(lat1)) * Math.cos(deg2Rad(lat2))
+                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         double d = R * c; // Distance in km
         return d;
+    }
+    public static boolean checkNumber(String s) {
+        try {
+            int z = Integer.parseInt(s);
+        } catch (NumberFormatException nbe) {
+            return false;
+        }
+        return true;
     }
 }

@@ -35,10 +35,10 @@ public class LoginFilter implements Filter {
         if (session.getAttribute("user")==null) {
             RequestDispatcher dispatcher = request.getRequestDispatcher("faces/login.xhtml");
             dispatcher.forward(request, response);
-            
         }
-        fc.doFilter(request, response);
-
+        if(!httpRequest.getRequestURI().contains("maps.googleapis.com"))
+            fc.doFilter(request, response);
+        
     }
 
     @Override

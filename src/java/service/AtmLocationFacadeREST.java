@@ -63,21 +63,21 @@ public class AtmLocationFacadeREST extends AbstractFacade<AtmLocation> {
 //    }
     @GET
     @Override
-    @Produces("application/xml")
+    @Produces("application/json;charset=UTF-8")
     public List<AtmLocation> findAll() {
         return atmDAO.findByGeocodingStatus('1');
     }
 
     @GET
     @Path("{lat}/{long}")
-    @Produces({"application/xml"})
+    @Produces("application/json;charset=UTF-8")
     public List<AtmLocation> findRange(@PathParam("lat") String lat1, @PathParam("long") String long1) {
         return atmDAO.find10NeareastATM(lat1, long1, "", '0');
     }
 
     @GET
     @Path("{type}/{bank}/{lat}/{long}")
-    @Produces({"application/xml"})
+    @Produces("application/json;charset=UTF-8")
     public List<AtmLocation> findRange(@PathParam("type") String type, @PathParam("bank") String bank, @PathParam("lat") String lat1, @PathParam("long") String long1) {
         if (type.equals("1")) {
             return atmDAO.find10NeareastATM(lat1, long1, bank, '1');
@@ -86,14 +86,6 @@ public class AtmLocationFacadeREST extends AbstractFacade<AtmLocation> {
         }
         return atmDAO.find10NeareastATM(lat1, long1, bank, '3');
     }
-
-//    @GET
-//    @Path("count")
-//    @Produces("text/plain")
-//    public String countREST() {
-//        return String.valueOf(super.count());
-//    }
-//
     @Override
     protected EntityManager getEntityManager() {
         return em;

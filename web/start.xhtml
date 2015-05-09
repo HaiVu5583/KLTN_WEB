@@ -5,7 +5,7 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:f="http://xmlns.jcp.org/jsf/core">
     <h:head>
-        <title>Facelet Title</title>
+        <title>Cập nhật dữ liệu</title>
         <style>
             *{
                 font-size: 14px;
@@ -14,10 +14,14 @@
                 margin-left: auto;
                 margin-right: auto;
             }
+            .hidden{
+                visibility: hidden;
+            }
         </style>
     </h:head>
     <h:body>
         <h:form id="form">
+            <p:growl id="msg" globalOnly="true" showSummary="true" />
             <p:menubar>
                 <p:menuitem value="Quản lí ATM" action="#{pageNavigator.toManagePage}" icon="ui-icon-wrench" style="margin: 5px;"/>
                 <p:menuitem value="Cập nhật dữ liệu" action="#{pageNavigator.toCrawlPage}" icon="ui-icon-arrowstop-1-s" style="margin: 5px;"/>
@@ -28,14 +32,26 @@
                 </f:facet>
             </p:menubar>
             <h:panelGrid columns="3" cellpadding="5" styleClass="center" style="margin-top: 100px;" >
-                <p:commandButton widgetVar="crawlBt" value="Lấy dữ liệu" actionListener="#{startController.crawlingData}" update="form"/>
-                <p:commandButton widgetVar="standardBt" value="Chuẩn hóa" actionListener="#{startController.standardlize}" update="form"/>
-                <p:commandButton widgetVar="latLongBt" value="Chuyển đổi sang tọa độ địa lí" actionListener="#{startController.getLatLong}" update="form"/>
+                <p:commandButton widgetVar="crawlBt" value="Lấy dữ liệu" actionListener="#{startController.crawlingData}" onstart="showStatus('Đang thu thập dữ liệu...');" oncomplete="hideStatus();" update="form"/>
+                <p:commandButton widgetVar="standardBt" value="Chuẩn hóa" actionListener="#{startController.standardlize}" onstart="showStatus('Đang chuẩn hóa dữ liệu...');" oncomplete="hideStatus();" update="form"/>
+                <p:commandButton widgetVar="latLongBt" value="Chuyển đổi sang tọa độ địa lí" actionListener="#{startController.getLatLong}" onstart="showStatus('Đang lấy tọa độ địa lí...');" oncomplete="hideStatus();" update="form"/>
             </h:panelGrid>
-            <h:panelGrid columns="1" styleClass="center">
-                <h:graphicImage value="images/loading.gif" rendered="#{startController.renderProgress}" styleClass="center"/>
-                <h:outputText rendered="#{startController.renderProgress}" value="#{startController.status}" styleClass="center"/>
+            <h:panelGrid columns="1" styleClass="center hidden" id="status">
+                <h:graphicImage value="images/loading.gif" styleClass="center" />
+                <h:outputText styleClass="center" id="status_text"/>
             </h:panelGrid>
+            <script type='text/javascript'>
+                function showStatus(text) {
+                    document.getElementById("form:status").style.visibility = "visible";
+                    document.getElementById("form:status_text").innerHTML = text;
+//                    alert("XXX");
+                }
+                function hideStatus() {
+                    document.getElementById("form:status").style.visibility = "hidden";
+                }
+            </script>
+            <h:outputText value="#{startController.status2}" />
+
         </h:form>
     </h:body>
 </html> 

@@ -127,9 +127,15 @@ public class ATMLocationDAO implements Serializable {
 
             tx = session.beginTransaction();
             Criteria cr = session.createCriteria(AtmLocation.class);
-            cr.add(Restrictions.eq("standardlization", standardlization));
-            cr.addOrder(Order.asc("id"));
-            list = cr.list();
+            if (standardlization != '0') {
+                cr.add(Restrictions.eq("standardlization", standardlization));
+                cr.addOrder(Order.asc("id"));
+                list = cr.list();
+            } else {
+                cr.add(Restrictions.isNull("standardlization"));
+                cr.addOrder(Order.asc("id"));
+                list = cr.list();
+            }
             tx.commit();
         } catch (HibernateException he) {
             if (tx != null && tx.isActive()) {
@@ -154,6 +160,28 @@ public class ATMLocationDAO implements Serializable {
             } else if (status == '0') {
                 cr.add(Restrictions.eqOrIsNull("latd", ""));
             }
+            cr.addOrder(Order.asc("id"));
+            list = cr.list();
+            tx.commit();
+        } catch (HibernateException he) {
+            if (tx != null && tx.isActive()) {
+                tx.rollback();
+            }
+        } finally {
+            session.close();
+        }
+        return list;
+    }
+    public List<AtmLocation> findGeocodingList(){
+         Session session = HibernateUtil.getSessionFactory().openSession();
+        List<AtmLocation> list = null;
+        Transaction tx = null;
+        try {
+
+            tx = session.beginTransaction();
+            Criteria cr = session.createCriteria(AtmLocation.class);
+            cr.add(Restrictions.isNull("latd"));
+            cr.add(Restrictions.eq("standardlization", '1'));
             cr.addOrder(Order.asc("id"));
             list = cr.list();
             tx.commit();
@@ -273,6 +301,7 @@ public class ATMLocationDAO implements Serializable {
 //        }
 //        return list.subList(0, 19);
 //    }
+
     public List<AtmLocation> find10NeareastATM(String lat1, String long1, String bank, char type) {
         Session session = HibernateUtil.getSessionFactory().openSession();
         List<AtmLocation> list = new ArrayList();
@@ -291,7 +320,6 @@ public class ATMLocationDAO implements Serializable {
                         list.get(i).copy(list.get(j));
                         list.get(j).copy(temp);
                     }
-
                 }
 
             }
@@ -318,7 +346,7 @@ public class ATMLocationDAO implements Serializable {
         } else if (type == '2') {
             BankInfoDAO bankInfoDAO = new BankInfoDAO();
             List<String> banks = bankInfoDAO.findByGroup(bank);
-            if(banks == null || banks.isEmpty()){
+            if (banks == null || banks.isEmpty()) {
                 cr.add(Restrictions.eq("bank", ""));
                 list = cr.list();
                 return list;

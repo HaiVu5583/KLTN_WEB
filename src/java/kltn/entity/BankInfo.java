@@ -15,7 +15,6 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
@@ -25,7 +24,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name = "\"KLTN\".bank_info")
 @NamedQueries({
     @NamedQuery(name = "BankInfo.findAll", query = "SELECT b FROM BankInfo b")})
-@XmlRootElement
 public class BankInfo implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -40,6 +38,9 @@ public class BankInfo implements Serializable {
     @Size(max = 100)
     @Column(name = "group")
     private String group;
+    @Size(max = 200)
+    @Column(name = "logo")
+    private String logo;
 
     public BankInfo() {
     }
@@ -72,6 +73,14 @@ public class BankInfo implements Serializable {
         this.group = group;
     }
 
+    public String getLogo() {
+        return logo;
+    }
+
+    public void setLogo(String logo) {
+        this.logo = logo;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -94,7 +103,7 @@ public class BankInfo implements Serializable {
 
     @Override
     public String toString() {
-        return "kltn.entity.BankInfo[ code=" + code + " ]";
+        return "kltn.entity.BankInfo_1[ code=" + code + " ]";
     }
     
 }

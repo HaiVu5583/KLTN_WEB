@@ -83,7 +83,7 @@
                     <h:outputText />
                     <h:outputText />
                     <h:outputText />
-                    <p:commandButton value="Tìm kiếm" icon= "ui-icon-search" actionListener="#{atmController.search}" update="form" styleClass="btn btn-success"/>
+                    <p:commandButton value="Tìm kiếm" icon= "ui-icon-search" actionListener="#{atmController.search}" update="form" styleClass="button success"/>
                 </h:panelGrid>
             </p:panel>
 
@@ -146,7 +146,6 @@
             </p:dataTable>
             <h:inputHidden id="latMarker" value="#{atmController.latMarker}" />
             <h:inputHidden id="lngMarker" value="#{atmController.lngMarker}" />
-            <p:commandButton id="btn" type="button" icon="ui-icon-pin-s" value="Show Map" actionListener="#{atmController.showMap}" update=":form:msg"/>
             <p:dialog header="Thông tin ATM" id="dialog" widgetVar="dialog" height="500" modal="true">
                 <h:panelGrid columns="4" cellpadding="10" id="atmInfo">
                     <h:outputText value="Địa chỉ" styleClass="input"/>
