@@ -5,6 +5,15 @@
  */
 package kltn.controller;
 
+import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.DomNodeList;
+import com.gargoylesoftware.htmlunit.html.HtmlDivision;
+import com.gargoylesoftware.htmlunit.html.HtmlElement;
+import com.gargoylesoftware.htmlunit.html.HtmlOption;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.html.HtmlSelect;
+import com.gargoylesoftware.htmlunit.html.HtmlTable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -18,6 +27,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
+import javax.ejb.Asynchronous;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -56,16 +66,48 @@ public class StartController implements Serializable {
 //        notStandardList = atmDAO.findByStandardlizationStatus('0');
     }
 
-    public void crawlingData() throws IOException, GeneralSecurityException {
-//        renderProgress = true;
-        status = "Đang tiến hành thu thập dữ liệu ...";
-        List<AtmLocation> vietinList = GetAtmData.getMBBankLocation();
-        status2 = Integer.toString(vietinList.size());
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(status2));
-//        RequestContext.getCurrentInstance().execute("PF('crawlBt').disable()");
+    @Asynchronous
+    public void crawlingData() throws IOException, GeneralSecurityException, InterruptedException {
+
+//        status = "Đang tiến hành thu thập dữ liệu ...";
+        ATMLocationDAO atmDAO = new ATMLocationDAO();
+//        status2 = "Đang cập nhật dữ liệu Vietcombank ATM";
+//        List<AtmLocation> vietcomAtmList = GetAtmData.getVietcombankATMLocation();
+//        atmDAO.synchronizeData(vietcomAtmList, "vietcombank");
+//        
+//        status2 = "Đang cập nhật dữ liệu Agribank ATM";
+//        List<AtmLocation> agriAtmList = GetAtmData.getAgribankATMLocation();
+//        atmDAO.synchronizeData(agriAtmList, "agribank");
+//        
+//        status2 = "Đang cập nhật dữ liệu Viettinbank ATM";
+//        List<AtmLocation> vietinAtmList = GetAtmData.getVietinbankATMLocation();
+//        atmDAO.synchronizeData(vietinAtmList, "vietinbank");
+//        
+//        status2 = "Đang cập nhật dữ liệu ACB ATM";
+//        List<AtmLocation> acbAtmList = GetAtmData.getAcbATMLocation();
+//        atmDAO.synchronizeData(acbAtmList, "vietinbank");
+//        
+//        status2 = "Đang cập nhật dữ liệu Techcombank ATM";
+//        List<AtmLocation> techcomAtmList = GetAtmData.getTechcombankATMLocation();
+//        atmDAO.synchronizeData(techcomAtmList, "techcombank");
+        
+        status2 = "Đang cập nhật dữ liệu VIB ATM";
+        List<AtmLocation> vibAtmList = GetAtmData.getVibAtmLocation();
+        atmDAO.synchronizeData(vibAtmList, "vib");
+        
+//        status2 = "Đang cập nhật dữ liệu MB ATM";
+//        List<AtmLocation> mbAtmList = GetAtmData.getMBBankLocation();
+//        atmDAO.synchronizeData(mbAtmList, "mbbank");
+//        
+//        status2 = "Đang cập nhật dữ liệu BIDV ATM";
+//        List<AtmLocation> bidvAtmList = GetAtmData.getBIDVATMLocation();
+//        atmDAO.synchronizeData(bidvAtmList, "bidv");
+        
+        status2 = "Cập nhật thành công";
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Cập nhật thành công"));
+
     }
 
-    
     public void standardlize() throws InterruptedException {
 
         ATMLocationDAO atmDAO = new ATMLocationDAO();
@@ -76,7 +118,7 @@ public class StartController implements Serializable {
             List<Area> areaList = areaDAO.listAll();
             List<EssentialWord> rejectWord = wordDAO.findByType('5');
             List<EssentialWord> determineWord = wordDAO.findByType('1');
-            List<EssentialWord> wordList = wordDAO.listAll();
+//            List<EssentialWord> wordList = wordDAO.listAll();
             List<EssentialWord> deleteWord = wordDAO.findByType('7');
 
             for (AtmLocation atm : notStandardList) {
@@ -338,83 +380,83 @@ public class StartController implements Serializable {
         atm.print();
     }
 
-    public void standardize() {
-        ATMLocationDAO atmDAO = new ATMLocationDAO();
-        AreaDAO areaDAO = new AreaDAO();
-        EssentialWordDAO wordDAO = new EssentialWordDAO();
-
-        List<AtmLocation> atmList = atmDAO.listAll();
-        List<Area> areaList = areaDAO.listAll();
-        List<EssentialWord> rejectWord = wordDAO.findByType('5');
-        List<EssentialWord> determineWord = wordDAO.findByType('1');
-//        List<EssentialWord> wordList = wordDAO.listAll();
-        List<EssentialWord> deleteWord = wordDAO.findByType('7');
-
-        for (AtmLocation atm : atmList) {
-            String s = atm.getFulladdress();
-            StringBuilder exactAddress = new StringBuilder();
-            s = oneSpace(s);
-            List<String> splitStr = split(s, "\\,|\\-|\\(|\\)|\\.|\\;");
-            List<String> exactAddressList = new ArrayList<>();
-            int numDetermine = 0;
-            for (int i = splitStr.size() - 1; i >= 0; i--) {
-                String element = splitStr.get(i).toLowerCase().trim();
-                if (!isNotAddress(element, rejectWord)) {
-
-                    if (check(areaList, '1', element)[0].equals("1")) {
-                        atm.setProvinceCity(check(areaList, '1', element)[1]);
-
-                    }
-                    if (check(areaList, '2', element)[0].equals("2")) {
-
-                        atm.setDistrict(check(areaList, '2', element)[1]);
-
-                    }
-
-                    if (check(areaList, '3', element)[0].equals("3")) {
-
-                        String precinct = check(areaList, '3', element)[1];
-
-                        if (checkPrecinct(precinct, atm.getDistrict(), atm.getProvinceCity(), areaList)) {
-                            atm.setPrecinct(precinct);
-
-                        }
-
-                    }
-
-                    if (isExactAddress(element) && !isDetermineLocation(element, determineWord)) {
-                        exactAddressList.add(element);
-
-                    } else if (isDetermineLocation(element, determineWord)) {
-                        numDetermine++;
-                        atm.setDetermineLocation(element);
-                    }
-                }
-            }
-            for (int i = exactAddressList.size() - 1; i >= 0; i--) {
-                exactAddress.append(exactAddressList.get(i));
-                if (i > 0) {
-                    exactAddress.append(",");
-                }
-            }
-            atm.setStreet(exactAddress.toString());
-            if (exactAddressList.size() == 1) {
-                atm.setStandardlization('1');
-            } else if (exactAddressList.isEmpty()) {
-                if (numDetermine == 1) {
-                    atm.setStandardlization('1');
-                }
-            } else {
-                atm.setStandardlization('2');
-            }
-        }
-        for (AtmLocation atm : atmList) {
-            if (atm.getStreet() != null && !atm.getStreet().isEmpty()) {
-                atm.setStreet(cutString(atm.getStreet(), deleteWord));
-            }
-        }
-        atmDAO.updateAll(atmList);
-    }
+//    public void standardize() {
+//        ATMLocationDAO atmDAO = new ATMLocationDAO();
+//        AreaDAO areaDAO = new AreaDAO();
+//        EssentialWordDAO wordDAO = new EssentialWordDAO();
+//
+//        List<AtmLocation> atmList = atmDAO.listAll();
+//        List<Area> areaList = areaDAO.listAll();
+//        List<EssentialWord> rejectWord = wordDAO.findByType('5');
+//        List<EssentialWord> determineWord = wordDAO.findByType('1');
+////        List<EssentialWord> wordList = wordDAO.listAll();
+//        List<EssentialWord> deleteWord = wordDAO.findByType('7');
+//
+//        for (AtmLocation atm : atmList) {
+//            String s = atm.getFulladdress();
+//            StringBuilder exactAddress = new StringBuilder();
+//            s = oneSpace(s);
+//            List<String> splitStr = split(s, "\\,|\\-|\\(|\\)|\\.|\\;");
+//            List<String> exactAddressList = new ArrayList<>();
+//            int numDetermine = 0;
+//            for (int i = splitStr.size() - 1; i >= 0; i--) {
+//                String element = splitStr.get(i).toLowerCase().trim();
+//                if (!isNotAddress(element, rejectWord)) {
+//
+//                    if (check(areaList, '1', element)[0].equals("1")) {
+//                        atm.setProvinceCity(check(areaList, '1', element)[1]);
+//
+//                    }
+//                    if (check(areaList, '2', element)[0].equals("2")) {
+//
+//                        atm.setDistrict(check(areaList, '2', element)[1]);
+//
+//                    }
+//
+//                    if (check(areaList, '3', element)[0].equals("3")) {
+//
+//                        String precinct = check(areaList, '3', element)[1];
+//
+//                        if (checkPrecinct(precinct, atm.getDistrict(), atm.getProvinceCity(), areaList)) {
+//                            atm.setPrecinct(precinct);
+//
+//                        }
+//
+//                    }
+//
+//                    if (isExactAddress(element) && !isDetermineLocation(element, determineWord)) {
+//                        exactAddressList.add(element);
+//
+//                    } else if (isDetermineLocation(element, determineWord)) {
+//                        numDetermine++;
+//                        atm.setDetermineLocation(element);
+//                    }
+//                }
+//            }
+//            for (int i = exactAddressList.size() - 1; i >= 0; i--) {
+//                exactAddress.append(exactAddressList.get(i));
+//                if (i > 0) {
+//                    exactAddress.append(",");
+//                }
+//            }
+//            atm.setStreet(exactAddress.toString());
+//            if (exactAddressList.size() == 1) {
+//                atm.setStandardlization('1');
+//            } else if (exactAddressList.isEmpty()) {
+//                if (numDetermine == 1) {
+//                    atm.setStandardlization('1');
+//                }
+//            } else {
+//                atm.setStandardlization('2');
+//            }
+//        }
+//        for (AtmLocation atm : atmList) {
+//            if (atm.getStreet() != null && !atm.getStreet().isEmpty()) {
+//                atm.setStreet(cutString(atm.getStreet(), deleteWord));
+//            }
+//        }
+//        atmDAO.updateAll(atmList);
+//    }
 
     public static String[] check(List<Area> areaList, Character type, String str) {
         String[] result = {"0", ""};

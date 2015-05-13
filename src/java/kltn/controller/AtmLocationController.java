@@ -10,7 +10,6 @@ import java.io.Serializable;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import javax.faces.application.NavigationHandler;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
@@ -24,6 +23,7 @@ import org.primefaces.model.map.DefaultMapModel;
 import org.primefaces.model.map.LatLng;
 import org.primefaces.model.map.MapModel;
 import org.primefaces.model.map.Marker;
+
 /**
  *
  * @author Vu
@@ -199,14 +199,18 @@ public class AtmLocationController implements Serializable {
             dialogAtm.setStandardlization(selectedAtm.getStandardlization());
             dialogAtm.setStreet(selectedAtm.getStreet());
             dialogAtm.setUniquecode(selectedAtm.getUniquecode());
-            selectedProvinceDialog = dialogAtm.getProvinceCity().toLowerCase().trim();
+            
+            if (dialogAtm.getProvinceCity() != null) {
+                selectedProvinceDialog = dialogAtm.getProvinceCity().toLowerCase().trim();
 
-            districtListDialog = areaDAO.findDistrictByProvince(selectedProvinceDialog);
-            selectedDistrictDialog = dialogAtm.getDistrict().toLowerCase().trim();
+                districtListDialog = areaDAO.findDistrictByProvince(selectedProvinceDialog);
+                if (dialogAtm.getDistrict() != null) {
+                    selectedDistrictDialog = dialogAtm.getDistrict().toLowerCase().trim();
+                    precinctListDialog = areaDAO.findPrecinctByProvinceAndDistrict(selectedProvinceDialog, selectedDistrictDialog);
+                    selectedPrecinctDialog = dialogAtm.getPrecinct().toLowerCase().trim();
+                }
 
-            precinctListDialog = areaDAO.findPrecinctByProvinceAndDistrict(selectedProvinceDialog, selectedDistrictDialog);
-            selectedPrecinctDialog = dialogAtm.getPrecinct().toLowerCase().trim();
-
+            }
             if (dialogAtm.getLatd() != null && !dialogAtm.getLatd().trim().equals("")) {
 
 //                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(Integer.toString(dialogAtm.getLatd().trim().length())));
@@ -267,6 +271,24 @@ public class AtmLocationController implements Serializable {
         dialogAtm.setProvinceCity(selectedProvinceDialog);
         dialogAtm.setDistrict(selectedDistrictDialog);
         dialogAtm.setPrecinct(selectedPrecinctDialog);
+        if(dialogAtm.getLatd().equals(""))
+            dialogAtm.setLatd(null);
+        if(dialogAtm.getLongd().equals(""))
+            dialogAtm.setLongd(null);
+        if(dialogAtm.getOpentime().equals(""))
+            dialogAtm.setOpentime(null);
+        if(dialogAtm.getUniquecode().equals(""))
+            dialogAtm.setUniquecode(null);
+        if(dialogAtm.getPhone().equals(""))
+            dialogAtm.setPhone(null);
+        if(dialogAtm.getDistrict().equals(""))
+            dialogAtm.setDistrict(null);
+        if(dialogAtm.getPrecinct().equals(""))
+            dialogAtm.setPrecinct(null);
+        if(dialogAtm.getProvinceCity().equals(""))
+            dialogAtm.setProvinceCity(null);
+        if(dialogAtm.getStreet().equals(""))
+            dialogAtm.setStreet(null);
         atmDAO.update(dialogAtm);
         atmList = atmDAO.listAll();
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Câp nhật thành công"));
@@ -283,7 +305,7 @@ public class AtmLocationController implements Serializable {
         ec.getSessionMap().remove("user");
 //        NavigationHandler nh = FacesContext.getCurrentInstance().getApplication().getNavigationHandler();
 //        nh.handleNavigation(FacesContext.getCurrentInstance(), null, "login");
-        ec.redirect(ec.getRequestContextPath()+"/faces/login.xhtml");
+        ec.redirect(ec.getRequestContextPath() + "/faces/login.xhtml");
     }
 
     public AtmLocation getSelectedAtm() {

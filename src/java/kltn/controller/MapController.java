@@ -82,6 +82,8 @@ public class MapController implements Serializable {
                 mapModel.addOverlay(new Marker(coord, "Thông tin ATM", atm, "images/bidv.png"));
             } else if (atm.getBank().toLowerCase().equals("acb")) {
                 mapModel.addOverlay(new Marker(coord, "Thông tin ATM", atm, "images/acb.png"));
+            } else if (atm.getBank().toLowerCase().equals("vib")) {
+                mapModel.addOverlay(new Marker(coord, "Thông tin ATM", atm, "images/vib.png"));
             } else {
                 mapModel.addOverlay(new Marker(coord, "Thông tin ATM", atm));
             }
@@ -171,6 +173,8 @@ public class MapController implements Serializable {
                 mapModel.addOverlay(new Marker(coord, "Thông tin ATM", atm, "images/bidv.png"));
             } else if (atm.getBank().toLowerCase().equals("acb")) {
                 mapModel.addOverlay(new Marker(coord, "Thông tin ATM", atm, "images/acb.png"));
+            } else if (atm.getBank().toLowerCase().equals("vib")) {
+                mapModel.addOverlay(new Marker(coord, "Thông tin ATM", atm, "images/vib.png"));
             } else {
                 mapModel.addOverlay(new Marker(coord, "Thông tin ATM", atm));
             }

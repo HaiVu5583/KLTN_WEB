@@ -35,6 +35,14 @@
         <filter-name>LoginFilter</filter-name>
         <url-pattern>/manage</url-pattern>
     </filter-mapping>
+    <filter-mapping>
+        <filter-name>LoginFilter</filter-name>
+        <url-pattern>/faces/start.xhtml</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>LoginFilter</filter-name>
+        <url-pattern>/crawl</url-pattern>
+    </filter-mapping>
     
     
     <filter>

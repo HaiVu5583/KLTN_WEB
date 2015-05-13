@@ -172,8 +172,9 @@ public class ATMLocationDAO implements Serializable {
         }
         return list;
     }
-    public List<AtmLocation> findGeocodingList(){
-         Session session = HibernateUtil.getSessionFactory().openSession();
+
+    public List<AtmLocation> findGeocodingList() {
+        Session session = HibernateUtil.getSessionFactory().openSession();
         List<AtmLocation> list = null;
         Transaction tx = null;
         try {
@@ -279,28 +280,107 @@ public class ATMLocationDAO implements Serializable {
         }
         return list;
     }
-//    public List<AtmLocation> find10NeareastATM(String lat1, String long1) {
-//        Session session = HibernateUtil.getSessionFactory().openSession();
-//        List<AtmLocation> list = null;
-//        Criteria cr = session.createCriteria(AtmLocation.class);
-//        cr.add(Restrictions.neOrIsNotNull("latd", ""));
-//        list = cr.list();
-//        for (AtmLocation atm : list) {
-//            atm.setDistance(Utils.distance(Double.parseDouble(lat1), Double.parseDouble(long1), Double.parseDouble(atm.getLatd()), Double.parseDouble(atm.getLongd())));
-//        }
-//        for (int i = 0; i < list.size() - 1; i++) {
-//            for (int j = i + 1; j < list.size(); j++) {
-//                if (list.get(i).getDistance() > list.get(j).getDistance()) {
-//                    AtmLocation temp = new AtmLocation();
-//                    temp.copy(list.get(i));
-//                    list.get(i).copy(list.get(j));
-//                    list.get(j).copy(temp);
-//                }
-//
+
+    //Đồng bộ dữ liệu trong database và dữ liệu lấy được
+    public void synchronizeData(List<AtmLocation> newList, String bank) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        List<AtmLocation> oldList = null;
+//        Transaction tx = null;
+        try {
+//            tx = session.beginTransaction();
+            Criteria cr = session.createCriteria(AtmLocation.class);
+            cr.add(Restrictions.eq("bank", bank).ignoreCase());
+            cr.addOrder(Order.asc("id"));
+            oldList = cr.list();
+
+            //Nếu dữ liệu chưa có, toàn bộ dữ liệu lấy được sẽ được thêm vào DB
+            if (oldList == null || oldList.isEmpty()) {
+                for (AtmLocation newAtm : newList) {
+                    session.save(newAtm);
+                }
+            } else {
+                for (AtmLocation newAtm : newList) {
+                    int count = 0;
+                    for (AtmLocation oldAtm : oldList) {
+                        //Neu trung Uniquecode thì tiến hành kiểm tra dữ liệu và update nếu cần thiết
+                        if (oldAtm.getUniquecode().equals(newAtm.getUniquecode())) {
+                            int count2 = 0;
+                            if (!oldAtm.getFulladdress().equals(newAtm.getFulladdress())) {
+                                //update reset
+                                oldAtm.setFulladdress(newAtm.getFulladdress());
+                                oldAtm.setStandardlization(null);
+                                oldAtm.setLatd(null);
+                                oldAtm.setLongd(null);
+                        
+                            }
+                            if (oldAtm.getOpentime() != newAtm.getOpentime()) {
+                                oldAtm.setOpentime(newAtm.getOpentime());
+                                count2++;
+                            }
+                            if (oldAtm.getNummachine() != newAtm.getNummachine()) {
+                                oldAtm.setNummachine(newAtm.getNummachine());
+                             
+                            }
+                            if (oldAtm.getPhone() != newAtm.getPhone()) {
+                                oldAtm.setPhone(newAtm.getPhone());
+                               
+                            }
+                            if (count2 != 0) {
+                                session.update(oldAtm);
+                            }
+                            count++;
+                        }
+                    }
+                    if (count == 0) {
+                        //insert
+                        session.save(newAtm);
+                    }
+                }
+                //Kiem tra xem dữ liệu trong DB còn tồn tại trong dữ liệu thực tế
+                for (AtmLocation oldAtm : oldList) {
+                    int count = 0;
+                    for (AtmLocation newAtm : newList) {
+                        if (newAtm.getUniquecode().equals(oldAtm.getUniquecode())) {
+                            count++;
+                        }
+                    }
+                    if (count == 0) {
+                        //delete
+                        session.delete(oldAtm);
+                    }
+                }
+            }
+//            tx.commit();
+        } catch (HibernateException he) {
+//            if (tx != null && tx.isActive()) {
+//                tx.rollback();
 //            }
-//        }
-//        return list.subList(0, 19);
-//    }
+        } finally {
+            session.close();
+        }
+    }
+    //    public List<AtmLocation> find10NeareastATM(String lat1, String long1) {
+    //        Session session = HibernateUtil.getSessionFactory().openSession();
+    //        List<AtmLocation> list = null;
+    //        Criteria cr = session.createCriteria(AtmLocation.class);
+    //        cr.add(Restrictions.neOrIsNotNull("latd", ""));
+    //        list = cr.list();
+    //        for (AtmLocation atm : list) {
+    //            atm.setDistance(Utils.distance(Double.parseDouble(lat1), Double.parseDouble(long1), Double.parseDouble(atm.getLatd()), Double.parseDouble(atm.getLongd())));
+    //        }
+    //        for (int i = 0; i < list.size() - 1; i++) {
+    //            for (int j = i + 1; j < list.size(); j++) {
+    //                if (list.get(i).getDistance() > list.get(j).getDistance()) {
+    //                    AtmLocation temp = new AtmLocation();
+    //                    temp.copy(list.get(i));
+    //                    list.get(i).copy(list.get(j));
+    //                    list.get(j).copy(temp);
+    //                }
+    //
+    //            }
+    //        }
+    //        return list.subList(0, 19);
+    //    }
 
     public List<AtmLocation> find10NeareastATM(String lat1, String long1, String bank, char type) {
         Session session = HibernateUtil.getSessionFactory().openSession();

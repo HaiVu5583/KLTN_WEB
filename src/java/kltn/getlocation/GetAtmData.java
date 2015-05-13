@@ -6,6 +6,7 @@
 package kltn.getlocation;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.DomNodeList;
 import com.gargoylesoftware.htmlunit.html.HtmlDivision;
@@ -16,17 +17,10 @@ import com.gargoylesoftware.htmlunit.html.HtmlSelect;
 import com.gargoylesoftware.htmlunit.html.HtmlTable;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import static kltn.controller.StartController.checkNumber;
 import kltn.entity.AtmLocation;
 import kltn.utils.Utils;
@@ -79,6 +73,7 @@ public class GetAtmData {
                         atm.setDistrict(district);
 //                        atm.setStreet(tr.select("td.agri-atm-tbl-name").text());
                         atm.setFulladdress(tr.select("td.agri-atm-tbl-name").text());
+                        atm.setUniquecode(tr.select("td.agri-atm-tbl-name").text());
                         atm.setOpentime(tr.select("td.agri-atm-tbl-xem").text());
                         String numMachine = tr.select("td.agri-atm-tbl-time").text();
                         String[] arr = numMachine.split("");
@@ -122,7 +117,7 @@ public class GetAtmData {
         for (int i = 0; i < list.size(); i++) {
             Element e = list.get(i);
             if (i % 4 == 0) {
-
+                atm.setUniquecode(e.text());
             } else if (i % 4 == 1) {
                 atm.setNummachine(Integer.parseInt(e.text()));
             } else if (i % 4 == 2) {
@@ -164,9 +159,10 @@ public class GetAtmData {
             for (int i = 0; i < tds.size(); i++) {
 
                 if (i % 5 == 0) {
-//                    System.out.println("");
+//                    atm.setUniquecode(tds.get(i).text());
                 } else if (i % 5 == 1) {
                     atm.setFulladdress(tds.get(i).text());
+                    atm.setUniquecode(tds.get(i).text());
 //                    System.out.println("Address: " + tds.get(i).text());
                 } else if (i % 5 == 2) {
                     if (Utils.checkNumber(tds.get(i).text())) {
@@ -217,10 +213,11 @@ public class GetAtmData {
             url = "https://www.techcombank.com.vn/mang-luoi-dia-diem-atm/danh-sach-chi-nhanh-phong-giao-dich-va-atm?fKeyword=&fCityId=" + hanoi.val() + "&fDistrictId=0&chkBranch=false&chkPriority=false&page=" + Integer.toString(i) + "&pageItems=50";
             doc2 = Jsoup.connect(url).timeout(10000).get();
             Element atmEntries = doc2.select(".entries").first();
-            Elements atmDescriotions = atmEntries.select(".description");
-
-            for (Element e : atmDescriotions) {
-
+            Elements atmDescriptions = atmEntries.select(".description");
+            Elements titleEntries = atmEntries.select(".title-entries");
+            for (int j = 0; j < atmDescriptions.size(); j++) {
+                Element e = atmDescriptions.get(j);
+                Element f = titleEntries.get(j);
                 AtmLocation atm = new AtmLocation();
                 atm.setBank("techcombank");
                 atm.setProvinceCity("Hà Nội");
@@ -228,6 +225,7 @@ public class GetAtmData {
                 if (!e.select(".tel").isEmpty()) {
                     atm.setPhone(e.select(".tel").first().text());
                 }
+                atm.setUniquecode(f.select("a").first().text());
                 atm.setOpentime(e.select(".timer").first().text());
                 atmList.add(atm);
             }
@@ -235,7 +233,7 @@ public class GetAtmData {
         return atmList;
     }
 
-    public static List<AtmLocation> getAcbATAMLocation() throws IOException {
+    public static List<AtmLocation> getAcbATMLocation() throws IOException {
         String mainUrl = "http://acb.com.vn/wps/portal/Home/atm";
         Document doc = Jsoup.connect(mainUrl).timeout(10000).get();
         Element cityList = doc.getElementById("cityId");
@@ -266,6 +264,8 @@ public class GetAtmData {
                         .data("params[]", district.val())
                         .data("params[]", "")
                         .data("params[]", hanoi.val())
+                        .data("params[]", "0")
+                        .data("params[]", "http://acb.com.vn:80/ACBMapPortlet/vn/MapMobi.jsp")
                         .timeout(10000).get();
                 if (!doc2.getElementsByClass("wrap-content-search-big").isEmpty()) {
                     Element table = doc2.getElementsByClass("wrap-content-search-big").first();
@@ -277,6 +277,7 @@ public class GetAtmData {
                         atm.setDistrict(district.text());
                         atm.setFulladdress(row.getElementsByClass("address").first().text());
                         atm.setOpentime(row.getElementsByClass("hours").first().text());
+                        atm.setUniquecode(row.getElementsByClass("type").first().text());
                         atm.setBank("acb");
                         atm.setPhone(row.getElementsByClass("tel-fax").first().text());
                         atmList.add(atm);
@@ -312,7 +313,7 @@ public class GetAtmData {
         List<AtmLocation> atmList = new ArrayList();
         for (int num = 1; num < lastPageNum; num++) {
             HtmlPage page2 = web.getPage(mainUrl + "?p=" + Integer.toString(num));
-            HtmlElement mainPage2 = page.getElementById("page");
+            HtmlElement mainPage2 = page2.getElementById("page");
             HtmlElement midCol2 = mainPage2.getElementsByAttribute("div", "class", "midCol").get(0);
             HtmlElement atmData = (HtmlElement) midCol2.getElementsByAttribute("div", "class", "atm-title").get(0).getParentNode();
             int size = atmData.getElementsByAttribute("div", "class", "atm-title").size();
@@ -332,9 +333,10 @@ public class GetAtmData {
     }
 
     public static List<AtmLocation> getMBBankLocation() throws IOException, GeneralSecurityException {
-        String mainUrl = "https://www.mbbank.com.vn/mangluoi/Lists/ATM/AllItems.aspx";
+        String mainUrl = "https://mbbank.com.vn/mangluoi/Lists/ATM/AllItems.aspx";
         WebClient web = new WebClient(BrowserVersion.FIREFOX_3_6);
-        web.waitForBackgroundJavaScript(100000);
+        web.waitForBackgroundJavaScript(10000);
+        web.setTimeout(100000);
         web.setUseInsecureSSL(true);
         web.setThrowExceptionOnScriptError(false);
         web.setThrowExceptionOnFailingStatusCode(false);
@@ -342,15 +344,29 @@ public class GetAtmData {
         web.setJavaScriptEnabled(true);
         web.setRedirectEnabled(true);
 
+//        StringBuilder sb = new StringBuilder();
         HtmlPage page = web.getPage(mainUrl);
         HtmlSelect cityList = page.getHtmlElementById("ctl00_m_g_4a61401d_237a_468a_b004_114aaf8a9af0_ctl01_DropDownList_Field");
         HtmlOption hanoi = cityList.getOptionByText("Hà Nội");
-        cityList.setSelectedAttribute(hanoi, true);
+//        cityList.setSelectedAttribute(hanoi, true);
+//        synchronized (page) {
+//                page.wait(20000);
+//            }
+//        status2 = hanoi.getValueAttribute();
         String url = mainUrl + hanoi.getValueAttribute();
         page = web.getPage(url);
         HtmlSelect districtList = (HtmlSelect) page.getHtmlElementById("ctl00_m_g_4a61401d_237a_468a_b004_114aaf8a9af0_ctl01_DropDownList_Field2");
         List<HtmlOption> districs = districtList.getOptions();
-//        List<String> list = new ArrayList<>();
+////        List<String> list = new ArrayList<>();
+//        for (HtmlOption o:districs){
+//            sb.append(o.asText());
+//            sb.append("__");
+//            sb.append(o.getValueAttribute());
+//            sb.append("\n");
+//        }
+
+//        ?FilterField1=temp1&FilterValue1=H%c3%a0+N%e1%bb%99i
+//        ?FilterField1=temp1&FilterValue1=H%c3%a0+N%e1%bb%99i
         List<AtmLocation> atmList = new ArrayList<>();
         for (HtmlOption o : districs) {
             System.out.println(o.asText());
@@ -369,6 +385,78 @@ public class GetAtmData {
                 atm.setDistrict(o.asText());
                 atm.setUniquecode(tds.get(2).asText());
                 atm.setFulladdress(tds.get(3).asText());
+                atmList.add(atm);
+            }
+        }
+        return atmList;
+    }
+
+    public static List<AtmLocation> getBIDVATMLocation() throws IOException, InterruptedException {
+        String url = "http://www.bidv.com.vn/chinhanh/ATM.aspx";
+        WebClient web = new WebClient(BrowserVersion.FIREFOX_3_6);
+        web.setAjaxController(new NicelyResynchronizingAjaxController());
+        web.waitForBackgroundJavaScript(4000);
+        web.setThrowExceptionOnScriptError(false);
+        web.setThrowExceptionOnFailingStatusCode(false);
+        web.setPrintContentOnFailingStatusCode(false);
+        web.setJavaScriptEnabled(true);
+        web.setRedirectEnabled(true);
+        web.setCssEnabled(false);
+
+        List<AtmLocation> atmList = new ArrayList<>();
+        HtmlPage page = web.getPage(url);
+        HtmlSelect ddTinh = page.getHtmlElementById("plcRoot_Layout_zoneMenu_PagePlaceholder_PagePlaceholder_Layout_zoneContent_pageplaceholder_pageplaceholder_Layout_zoneContent_DSATM_ddlTinh");
+        HtmlOption hanoi = ddTinh.getOptionByText("Hà Nội");
+
+        ddTinh.setSelectedAttribute(hanoi, true);
+        synchronized (page) {
+            page.wait(10000);
+        }
+        HtmlSelect ddHuyen = page.getHtmlElementById("plcRoot_Layout_zoneMenu_PagePlaceholder_PagePlaceholder_Layout_zoneContent_pageplaceholder_pageplaceholder_Layout_zoneContent_DSATM_ddlHuyen");
+        List<HtmlOption> huyen = ddHuyen.getOptions();
+        String hanoiID = hanoi.getValueAttribute();
+        List<String> huyenID = new ArrayList<>();
+        for (HtmlOption ho : huyen) {
+            huyenID.add(ho.getValueAttribute());
+        }
+        int size = huyen.size();
+        for (int i = 1; i < size; i++) {
+            HtmlPage page2 = web.getPage(url);
+//        System.out.println(page2.asText());
+            HtmlSelect ddTinh2 = page2.getHtmlElementById("plcRoot_Layout_zoneMenu_PagePlaceholder_PagePlaceholder_Layout_zoneContent_pageplaceholder_pageplaceholder_Layout_zoneContent_DSATM_ddlTinh");
+            HtmlOption hanoi2 = ddTinh2.getOptionByText("Hà Nội");
+//
+            ddTinh2.setSelectedAttribute(hanoi2, true);
+            synchronized (page2) {
+                page2.wait(20000);
+            }
+            HtmlSelect ddHuyen2 = page2.getHtmlElementById("plcRoot_Layout_zoneMenu_PagePlaceholder_PagePlaceholder_Layout_zoneContent_pageplaceholder_pageplaceholder_Layout_zoneContent_DSATM_ddlHuyen");
+//            System.out.println("DDHuyen2: " + ddHuyen2.asXml());
+            HtmlOption ho = ddHuyen2.getOption(i);
+            System.out.println("Huyen: " + ho.asText());
+            String district = ho.asText();
+            System.out.println("==========================================================");
+//            System.out.println("HO " + ho.asXml());
+            ddHuyen2.setSelectedAttribute(ho, true);
+            synchronized (page2) {
+                page2.wait(20000);
+            }
+//            System.out.println(page2.asText());
+            HtmlDivision div = (HtmlDivision) page2.getElementById("plcRoot_Layout_zoneMenu_PagePlaceholder_PagePlaceholder_Layout_zoneContent_pageplaceholder_pageplaceholder_Layout_zoneContent_DSATM_UpdatePanel1");
+            HtmlDivision content = (HtmlDivision) div.getElementsByAttribute("div", "class", "tim_atm_box").get(1);
+            DomNodeList<HtmlElement> atmTables = content.getElementsByTagName("table");
+            for (int j = 1; j < atmTables.size(); j++) {
+                HtmlElement currentElement = atmTables.get(j);
+                AtmLocation atm = new AtmLocation();
+                atm.setBank("bidv");
+                atm.setProvinceCity("Hà Nội");
+                atm.setDistrict(district);
+                String address = currentElement.getElementsByAttribute("td", "class", "diadanh_sub11").get(0).asText();
+                String time = currentElement.getElementsByAttribute("td", "class", "hoatdong_sub11").get(0).asText();
+                String machineCode = currentElement.getElementsByAttribute("td", "class", "hoatdong_sub11").get(1).asText();
+                atm.setUniquecode(machineCode);
+                atm.setFulladdress(address);
+                atm.setOpentime(time);
                 atmList.add(atm);
             }
         }
