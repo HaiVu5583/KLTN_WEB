@@ -19,7 +19,6 @@ import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.DisjunctionFragment;
 
 /**
  *
@@ -41,6 +40,46 @@ public class ATMLocationDAO implements Serializable {
             Criteria cr = session.createCriteria(AtmLocation.class);
             cr.addOrder(Order.asc("id"));
             list = cr.list();
+            tx.commit();
+        } catch (HibernateException he) {
+            if (tx != null && tx.isActive()) {
+                tx.rollback();
+            }
+        } finally {
+            session.close();
+        }
+        return list;
+    }
+
+    public List<AtmLocation> listByName(String type, String name) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        List<AtmLocation> list = new ArrayList();
+        Transaction tx = null;
+        try {
+
+            tx = session.beginTransaction();
+            Criteria cr = session.createCriteria(AtmLocation.class);
+            cr.addOrder(Order.asc("id"));
+            cr.add(Restrictions.isNotNull("latd"));
+            if (type.equals("1")) {
+                cr.add(Restrictions.eq("bank", name).ignoreCase());
+                list = cr.list();
+            } else if (type.equals("2")) {
+                BankInfoDAO bankInfoDAO = new BankInfoDAO();
+                List<String> banks = bankInfoDAO.findByGroup(name);
+                if (banks == null || banks.isEmpty()) {
+//                    cr.add(Restrictions.eq("bank", ""));
+//                    list = cr.list();
+                    return list;
+                }
+                Disjunction dis = Restrictions.disjunction();
+                for (String s : banks) {
+                    dis.add(Restrictions.eq("bank", s).ignoreCase());
+                }
+                cr.add(dis);
+                list = cr.list();
+            }
+
             tx.commit();
         } catch (HibernateException he) {
             if (tx != null && tx.isActive()) {
@@ -311,7 +350,7 @@ public class ATMLocationDAO implements Serializable {
                                 oldAtm.setStandardlization(null);
                                 oldAtm.setLatd(null);
                                 oldAtm.setLongd(null);
-                        
+
                             }
                             if (oldAtm.getOpentime() != newAtm.getOpentime()) {
                                 oldAtm.setOpentime(newAtm.getOpentime());
@@ -319,11 +358,11 @@ public class ATMLocationDAO implements Serializable {
                             }
                             if (oldAtm.getNummachine() != newAtm.getNummachine()) {
                                 oldAtm.setNummachine(newAtm.getNummachine());
-                             
+
                             }
                             if (oldAtm.getPhone() != newAtm.getPhone()) {
                                 oldAtm.setPhone(newAtm.getPhone());
-                               
+
                             }
                             if (count2 != 0) {
                                 session.update(oldAtm);
@@ -427,8 +466,8 @@ public class ATMLocationDAO implements Serializable {
             BankInfoDAO bankInfoDAO = new BankInfoDAO();
             List<String> banks = bankInfoDAO.findByGroup(bank);
             if (banks == null || banks.isEmpty()) {
-                cr.add(Restrictions.eq("bank", ""));
-                list = cr.list();
+//                cr.add(Restrictions.eq("bank", ""));
+//                list = cr.list();
                 return list;
             }
             Disjunction dis = Restrictions.disjunction();

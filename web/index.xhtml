@@ -98,7 +98,7 @@
                 <p:column headerText="STT" style="width: 20px;">
                     #{rowIndex+1}
                 </p:column>
-                <p:column headerText="Địa chỉ" style="width: 200px;white-space:pre-line;">
+                <p:column headerText="Địa chỉ" style="width: 250px;white-space:pre-line;">
                     <h:outputText value="#{atm.fulladdress}" />
                 </p:column>
 
@@ -117,7 +117,7 @@
                 <p:column headerText="Ngân hàng" style="width: 80px;">
                     <h:outputText value="#{atm.bank}" />
                 </p:column>
-                <p:column headerText="Giờ hoạt động" style="width: 50px;white-space:pre-line;">
+                <p:column headerText="Giờ hoạt động" style="width: 70px;white-space:pre-line;">
                     <h:outputText value="#{atm.opentime}" />
                 </p:column>
                 <p:column headerText="SĐT" style="width: 80px;">
@@ -126,8 +126,11 @@
                 <p:column headerText="Số máy" style="width: 50px;">
                     <h:outputText value="#{atm.nummachine}" />
                 </p:column>
-                <p:column headerText="Mã máy" style="width: 50px;white-space:pre-line;">
+                <p:column headerText="Mã máy" style="width: 250px;white-space:pre-line;">
                     <h:outputText value="#{atm.uniquecode}" />
+                </p:column>
+                <p:column headerText="TT Chuẩn Hóa" style="width: 70px;white-space:pre-line;">
+                    <h:outputText value="#{atm.standardlization}" />
                 </p:column>
                 <p:column headerText="Vĩ độ" style="width: 80px;">
                     <h:outputText value="#{atm.latd}" />
@@ -185,6 +188,8 @@
                     <p:inputText value="#{atmController.dialogAtm.nummachine}" styleClass="input"/>
                     <h:outputText value="Mã máy" styleClass="input"/>
                     <p:inputText value="#{atmController.dialogAtm.uniquecode}" styleClass="input"/>
+                    <h:outputText value="Trạng thái chuẩn hóa" styleClass="input"/>
+                    <p:inputText value="#{atmController.dialogAtm.standardlization}" styleClass="input"/>
                     <h:outputText value="Vĩ độ" styleClass="input" />
                     <p:inputText value="#{atmController.dialogAtm.latd}" styleClass="input"/>
                     <h:outputText value="Kinh độ" styleClass="input"/>
@@ -209,7 +214,7 @@
             </p:confirmDialog>
             <p:confirmDialog message="Bạn có chắc muốn xóa dữ liệu?"  
                              header="Xác nhận" severity="alert" widgetVar="deleteConfirm" style="margin-left: auto; margin-right: auto;">  
-                <p:commandButton value="Ok" actionListener="#{atmController.delete}" update="msg, atmInfo, mapInfo"/>
+                <p:commandButton value="Ok" actionListener="#{atmController.delete}" update="msg, atmInfo, mapInfo, atmData"/>
                 <p:commandButton value="Cancel" onclick="PF('deleteConfirm').hide();"/>
             </p:confirmDialog>
             <script type="text/javascript">

@@ -5,15 +5,6 @@
  */
 package kltn.controller;
 
-import com.gargoylesoftware.htmlunit.BrowserVersion;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.DomNodeList;
-import com.gargoylesoftware.htmlunit.html.HtmlDivision;
-import com.gargoylesoftware.htmlunit.html.HtmlElement;
-import com.gargoylesoftware.htmlunit.html.HtmlOption;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.html.HtmlSelect;
-import com.gargoylesoftware.htmlunit.html.HtmlTable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -92,8 +83,8 @@ public class StartController implements Serializable {
 //        atmDAO.synchronizeData(techcomAtmList, "techcombank");
         
         status2 = "Đang cập nhật dữ liệu VIB ATM";
-        List<AtmLocation> vibAtmList = GetAtmData.getVibAtmLocation();
-        atmDAO.synchronizeData(vibAtmList, "vib");
+        List<AtmLocation> vibAtmList = GetAtmData.getVietcombankATMLocation();
+        atmDAO.synchronizeData(vibAtmList, "vietcombank");
         
 //        status2 = "Đang cập nhật dữ liệu MB ATM";
 //        List<AtmLocation> mbAtmList = GetAtmData.getMBBankLocation();
@@ -281,16 +272,13 @@ public class StartController implements Serializable {
                         }
                     }
                 }
-//                if (countMatch == 0) {
-//                    atm.setStandardlization('3');
-//                }
-                //                }
                 System.out.println("=============================================================================");
-                atmDAO.update(atm);
-                Thread.sleep(300);
+                if(atm.getLatd()!=null && !atm.getLatd().trim().equals("")){
+                    atmDAO.update(atm);
+                    Thread.sleep(300);
+                }
             }
         }
-//        atmDAO.updateAll(atmList);
     }
 
     public static void prinTest(AtmLocation atm) throws InterruptedException, org.json.simple.parser.ParseException, MalformedURLException, IOException {

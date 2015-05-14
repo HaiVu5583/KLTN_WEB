@@ -32,7 +32,7 @@ public class LoginFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpSession session = httpRequest.getSession(false);
 //        Object user = FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("user");
-        if (session==null || session.getAttribute("user")==null) {
+        if ((session==null || session.getAttribute("user")==null) && !httpRequest.getRequestURI().contains("maps.googleapis.com")) {
             RequestDispatcher dispatcher = request.getRequestDispatcher("faces/login.xhtml");
             dispatcher.forward(request, response);
         }

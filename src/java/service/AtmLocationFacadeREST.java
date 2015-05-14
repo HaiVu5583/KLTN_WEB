@@ -69,16 +69,24 @@ public class AtmLocationFacadeREST extends AbstractFacade<AtmLocation> {
     }
 
     @GET
-    @Path("{lat}/{long}")
+    @Path("0/{lat}/{long}")
     @Produces("application/json;charset=UTF-8")
-    public List<AtmLocation> findRange(@PathParam("lat") String lat1, @PathParam("long") String long1) {
+    public List<AtmLocation> findNearestAtm(@PathParam("lat") String lat1, @PathParam("long") String long1) {
         return atmDAO.find10NeareastATM(lat1, long1, "", '0');
     }
 
     @GET
+    @Path("{type}/{name}")
+    @Produces("application/json;charset=UTF-8")
+    public List<AtmLocation> findAtm(@PathParam("type") String type, @PathParam("name") String name) {
+//        return atmDAO.find10NeareastATM(lat1, long1, "", '0');
+        return atmDAO.listByName(type, name);
+    }
+    
+    @GET
     @Path("{type}/{bank}/{lat}/{long}")
     @Produces("application/json;charset=UTF-8")
-    public List<AtmLocation> findRange(@PathParam("type") String type, @PathParam("bank") String bank, @PathParam("lat") String lat1, @PathParam("long") String long1) {
+    public List<AtmLocation> findNearestAtm(@PathParam("type") String type, @PathParam("bank") String bank, @PathParam("lat") String lat1, @PathParam("long") String long1) {
         if (type.equals("1")) {
             return atmDAO.find10NeareastATM(lat1, long1, bank, '1');
         } else if (type.equals("2")) {

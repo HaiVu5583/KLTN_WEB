@@ -51,7 +51,7 @@
                         <p:commandButton value="Tìm kiếm" icon= "ui-icon-search" update=":form:map" actionListener="#{mapController.search}"/>
                     </h:panelGrid>
                 </p:panel>
-                <p:gmap id="map" center="21.039483, 105.782940" zoom="13" type="ROADMAP" style="min-width: 1050px;height: 600px;" 
+                <p:gmap id="map" center="21.015730,105.804827" zoom="14" type="ROADMAP" style="min-width: 1050px;height: 600px;" 
                         mapTypeControl="false" model="#{mapController.mapModel}" >
                     <p:ajax event="overlaySelect" listener="#{mapController.onMarkerSelect}" update="infoWindow"/>
 

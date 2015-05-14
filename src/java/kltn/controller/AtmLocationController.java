@@ -207,7 +207,8 @@ public class AtmLocationController implements Serializable {
                 if (dialogAtm.getDistrict() != null) {
                     selectedDistrictDialog = dialogAtm.getDistrict().toLowerCase().trim();
                     precinctListDialog = areaDAO.findPrecinctByProvinceAndDistrict(selectedProvinceDialog, selectedDistrictDialog);
-                    selectedPrecinctDialog = dialogAtm.getPrecinct().toLowerCase().trim();
+                    if(dialogAtm.getPrecinct()!=null)
+                        selectedPrecinctDialog = dialogAtm.getPrecinct().toLowerCase().trim();
                 }
 
             }
@@ -264,7 +265,10 @@ public class AtmLocationController implements Serializable {
     }
 
     public void delete() {
+        atmDAO.delete(selectedAtm);
+        atmList = atmDAO.listAll();
         RequestContext.getCurrentInstance().execute("PF('deleteConfirm').hide()");
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Xóa thành công"));
     }
 
     public void update() {
